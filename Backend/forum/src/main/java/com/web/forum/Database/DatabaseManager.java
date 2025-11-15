@@ -55,6 +55,7 @@ public class DatabaseManager {
                     "id SERIAL PRIMARY KEY," +
                     "name VarChar(50), " +
                     "password VarChar(50), " +
+                    "role VarChar(15), " +
                     "profileImagePath VarChar(100), " +
                     "createdAt VarChar(10), " +
                     "deletedAt VarChar(10), " +
