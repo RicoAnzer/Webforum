@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.web.forum.Database.DatabaseManager;
 import com.web.forum.Entity.User;
+import com.web.forum.Roles;
 
 public class UserDAO implements IUserDAO {
 
@@ -29,8 +30,8 @@ public class UserDAO implements IUserDAO {
     @Override
     public ResponseEntity<String> create(User user) {
         //SQL Statement to add new users to database
-        String createSQL = "INSERT INTO users (name, password, role, profileImagePath, deletedAt)" +
-               "VALUES (?, ?, ?, ?, ?);";
+        String createSQL = "INSERT INTO users (name, password, role, profileImagePath, createdAt, deletedAt, isBanned)" +
+               "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(createSQL)) 
@@ -41,9 +42,11 @@ public class UserDAO implements IUserDAO {
             //=> deletedAt should be null at creation, set date only after User deleted account
             statement.setString(1, user.getName());
             statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole());
+            statement.setString(3, user.getRole().toString());
             statement.setString(4, user.getProfileImagePath());
-            statement.setString(5, user.getDeletedAt());
+            statement.setString(5, user.getCreatedAt());
+            statement.setString(6, user.getDeletedAt());
+            statement.setBoolean(7, user.getIsBanned());
             statement.executeUpdate();
         } 
         catch (SQLException e) 
@@ -67,12 +70,19 @@ public class UserDAO implements IUserDAO {
             ResultSet result = statement.executeQuery();
             //Create new Article Object using results from statement above
             while (result.next()) {
-                //For every entry create new Article Object...
+                //For every entry...
+                //...check user role and...
+                Enum<Roles> userRole = null;
+                switch (result.getString("role")) {
+                    case "user" -> userRole = Roles.user;
+                    case "moderator" -> userRole = Roles.moderator;
+                }
+                //...create new Article Object
                 user = new User(
-                        result.getLong("id"),
+
                         result.getString("name"),
                         result.getString("password"),
-                        result.getString("role"),
+                        userRole,
                         result.getString("profileImagePath"),
                         result.getString("createdAt"),
                         result.getString("deletedAt"),
@@ -113,7 +123,7 @@ public class UserDAO implements IUserDAO {
         {
             statement.setString(1, user.getName());
             statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole());
+            statement.setString(3, user.getRole().toString());
             statement.setString(4, user.getDeletedAt());
             statement.setBoolean(5, user.getIsBanned());
             statement.setLong(6, userId);

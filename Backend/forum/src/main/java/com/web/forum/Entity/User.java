@@ -1,19 +1,20 @@
 package com.web.forum.Entity;
+
+import com.web.forum.Roles;
+
 //No JPA used in this project => repository and dao done manually
 public class User {
 
-    private final Long id;
     private String name;
     private String password;
-    private String role;
+    private Enum<Roles> role;
     private String profileImagePath;
     private final String createdAt;
     private String deletedAt;
     private Boolean isBanned;
 
     //Constructor
-    public User(Long id, String name, String password, String role, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
-        this.id = id;
+    public User(String name, String password, Enum<Roles> role, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
         this.name = name;
         this.password = password;
         this.role = role;
@@ -24,10 +25,6 @@ public class User {
     }
 
     //Getters
-    public Long getId() {
-        return id;
-    }
-
     public String getName() {
         return name;
     }
@@ -36,7 +33,7 @@ public class User {
         return password;
     }
 
-    public String getRole() {
+    public Enum<Roles> getRole() {
         return role;
     }
 
@@ -65,8 +62,8 @@ public class User {
         this.password = password;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public Enum<Roles> setRole(Enum<Roles> role) {
+        return this.role = role;
     }
 
     public void setProfileImagePath(String profileImagePath) {
