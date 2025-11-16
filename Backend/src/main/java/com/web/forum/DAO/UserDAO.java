@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 
 import com.web.forum.Database.DatabaseManager;
 import com.web.forum.Entity.User;
 import com.web.forum.Roles;
 
+@Repository
 public class UserDAO implements IUserDAO {
 
     //Logger
