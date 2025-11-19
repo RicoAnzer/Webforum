@@ -11,6 +11,7 @@ public class UserRepository implements IUserRepository {
 
     //UserDAO
     private final UserDAO userDAO;
+
     //Constructor
     public UserRepository(UserDAO userDAO) {
         this.userDAO = userDAO;

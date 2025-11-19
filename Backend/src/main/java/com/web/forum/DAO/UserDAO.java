@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
+import com.web.forum.Configurations.PostgresProperties;
 import com.web.forum.Database.DatabaseManager;
 import com.web.forum.Entity.User;
 import com.web.forum.Roles;
@@ -20,11 +21,13 @@ public class UserDAO implements IUserDAO {
 
     //Logger
     private static final Logger log = LoggerFactory.getLogger(UserDAO.class);
+    //Connection
     private final Connection connection;
 
     //Constructor
-    public UserDAO(DatabaseManager databaseManager)
+    public UserDAO(DatabaseManager databaseManager, PostgresProperties postgresProperties)
     {
+        databaseManager.startDatabase(postgresProperties.getUrl(), postgresProperties.getUsername(), postgresProperties.getPassword());
         connection = databaseManager.connection;
     }
 
@@ -32,7 +35,7 @@ public class UserDAO implements IUserDAO {
     @Override
     public ResponseEntity<String> create(User user) {
         //SQL Statement to add new users to database
-        String createSQL = "INSERT INTO users (name, password, role, profileImagePath, createdAt, deletedAt, isBanned)" +
+        String createSQL = "INSERT INTO users (name, password, role, profile_image_path, created_at, deleted_at, is_banned)" +
                "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         //Execute statement
@@ -44,7 +47,7 @@ public class UserDAO implements IUserDAO {
             //=> deletedAt should be null at creation, set date only after User deleted account
             statement.setString(1, user.getName());
             statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole().toString());
+            statement.setString(3, user.getRole().name());
             statement.setString(4, user.getProfileImagePath());
             statement.setString(5, user.getCreatedAt());
             statement.setString(6, user.getDeletedAt());
@@ -74,10 +77,10 @@ public class UserDAO implements IUserDAO {
             while (result.next()) {
                 //For every entry...
                 //...check user role and...
-                Enum<Roles> userRole = null;
+                Roles userRole = null;
                 switch (result.getString("role")) {
-                    case "user" -> userRole = Roles.user;
-                    case "moderator" -> userRole = Roles.moderator;
+                    case "user" -> userRole = Roles.USER;
+                    case "moderator" -> userRole = Roles.MODERATOR;
                 }
                 //...create new Article Object
                 user = new User(
@@ -85,10 +88,10 @@ public class UserDAO implements IUserDAO {
                         result.getString("name"),
                         result.getString("password"),
                         userRole,
-                        result.getString("profileImagePath"),
-                        result.getString("createdAt"),
-                        result.getString("deletedAt"),
-                        result.getBoolean("isBanned")
+                        result.getString("profile_image_path"),
+                        result.getString("created_at"),
+                        result.getString("deleted_at"),
+                        result.getBoolean("is_Banned")
                 );
             }
         }   
@@ -118,7 +121,7 @@ public class UserDAO implements IUserDAO {
         //=> Fields id, profileImagePath and createdAt are unchangeable
 
         //SQL Statement to add new Article to database
-        String updateSQL = "UPDATE users SET name = ?, password = ?, role = ?, deletedAt = ?, isBanned " +
+        String updateSQL = "UPDATE users SET name = ?, password = ?, role = ?, deleted_at = ?, is_banned " +
                         "WHERE id = ?;";
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(updateSQL)) 

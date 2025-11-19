@@ -7,14 +7,14 @@ public class User {
 
     private String name;
     private String password;
-    private Enum<Roles> role;
+    private Roles role;
     private String profileImagePath;
     private final String createdAt;
     private String deletedAt;
     private Boolean isBanned;
 
     //Constructor
-    public User(String name, String password, Enum<Roles> role, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
+    public User(String name, String password, Roles role, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
         this.name = name;
         this.password = password;
         this.role = role;
@@ -33,7 +33,7 @@ public class User {
         return password;
     }
 
-    public Enum<Roles> getRole() {
+    public Roles getRole() {
         return role;
     }
 
@@ -62,7 +62,7 @@ public class User {
         this.password = password;
     }
 
-    public Enum<Roles> setRole(Enum<Roles> role) {
+    public Roles setRole(Roles role) {
         return this.role = role;
     }
 

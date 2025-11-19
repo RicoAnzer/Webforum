@@ -45,9 +45,9 @@ public class DatabaseManager {
             //Initialize table for threads
             String createThreadSQL = "CREATE TABLE IF NOT EXISTS threads (" +
                     "id SERIAL PRIMARY KEY," +
-                    "topicId INT, " +
+                    "topic_id INT, " +
                     "name VarChar(100), " +
-                    "CONSTRAINT fk_topicId FOREIGN KEY (topicId)" +
+                    "CONSTRAINT fk_topic_id FOREIGN KEY (topic_id)" +
                     "REFERENCES topics(id) ON DELETE CASCADE" +
                     ")";
             //Initialize table for users
@@ -56,20 +56,20 @@ public class DatabaseManager {
                     "name VarChar(50), " +
                     "password VarChar(50), " +
                     "role VarChar(15), " +
-                    "profileImagePath VarChar(100), " +
-                    "createdAt VarChar(10), " +
-                    "deletedAt VarChar(10), " +
-                    "isBanned Boolean" +
+                    "profile_image_path VarChar(100), " +
+                    "created_at VarChar(10), " +
+                    "deleted_at VarChar(10), " +
+                    "is_banned Boolean" +
                     ")";
             //Initialize table for posts
             String createPostSQL = "CREATE TABLE IF NOT EXISTS posts (" +
                     "id SERIAL PRIMARY KEY," +
-                    "userId INT, " +
-                    "threadId INT, " +
-                    "content VarChar(1000), " +
-                    "CONSTRAINT fk_userId FOREIGN KEY (userId)" +
+                    "user_id INT, " +
+                    "thread_id INT, " +
+                    "content JSONB, " +
+                    "CONSTRAINT fk_user_id FOREIGN KEY (user_id)" +
                     "REFERENCES users(id) ON DELETE SET NULL," +
-                    "CONSTRAINT fk_threadId FOREIGN KEY (threadId)" +
+                    "CONSTRAINT fk_thread_id FOREIGN KEY (thread_id)" +
                     "REFERENCES threads(id) ON DELETE CASCADE" +
                     ")";
             
