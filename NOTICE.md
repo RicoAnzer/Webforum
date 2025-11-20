@@ -31,11 +31,14 @@ This Software Is Provided By The Copyright Holders And Contributors “as Is” 
 --------------------------------------------------------------
 **MIT License** applies to
 - React Framework
+- react-dom
+- react-router-dom
 - axios
 - vite
 - Node.js
 --------------------------------------------------------------
 <p>Copyright (c) Meta Platforms, Inc. and affiliates<br>
+Copyright (c) React Training LLC 2015-2019 Copyright (c) Remix Software Inc. 2020-2021 Copyright (c) Shopify Inc. 2022-2023<br>
 Copyright (c) Node.js contributors<br>
 Copyright (c) 2019-present, VoidZero Inc. and Vite contributors<br>
 Copyright (c) 2014-present Matt Zabriskie & Collaborators</p>

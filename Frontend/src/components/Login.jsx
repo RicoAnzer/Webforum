@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, BrowserRouter} from 'react-router-dom';
+import SignupPage from './SignUp.jsx';
 import '../Styles/SignUp.css';
 
-function SignUp () {
-   const [name, setName] = useState("");
-   const [password, setPassword] = useState("");
-   const [passwordConfirm, setPasswordConfirm] = useState("");
-   return ( 
+function Login () {
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirm, setPasswordConfirm] = useState("");
+    return ( 
       <div className="register-container">
-        <h1 className='headline'>Registrieren</h1>
+        <h1 className='headline'>Anmelden</h1>
         <form className="register-form" onSubmit={e => e.preventDefault()}>
           <div className="form-group">
             <label className='secondary-text' htmlFor="name">Name</label>
@@ -18,7 +19,7 @@ function SignUp () {
                    placeholder="Dein Name" 
                    onChange={(e) => setName(e.target.value)} />
           </div>
-   
+
           <div className="form-group">
             <label className='secondary-text' htmlFor="password">Passwort</label>
             <input type="password" 
@@ -28,25 +29,15 @@ function SignUp () {
                    onChange={(e) => setPassword(e.target.value)} 
                    />
           </div>
-   
-          <div className="form-group">
-            <label className='secondary-text' htmlFor="confirmPassword">Passwort wiederholen</label>
-            <input type="password" 
-                   id="confirmPassword" 
-                   name="confirmPassword" 
-                   placeholder="Passwort bestätigen" 
-                   onChange={(e) => setPasswordConfirm(e.target.value)} 
-                   />
-          </div>
-   
-          <button type="submit" className="submit-btn">Registrieren</button>
-        </form>
 
+          <button type="submit" className="submit-btn">Anmelden</button>
+        </form>
+        
         <div className="hint">
-            Bereits registriert? <a href="/">Einloggen</a>
+            Noch keinen Account? <a href="/signup">Registrieren</a>
         </div>
       </div>
     );
 }
 
-export default SignUp;
+export default Login;
