@@ -28,7 +28,7 @@ public class UserDAO implements IUserDAO {
     public UserDAO(DatabaseManager databaseManager, PostgresProperties postgresProperties)
     {
         databaseManager.startDatabase(postgresProperties.getUrl(), postgresProperties.getUsername(), postgresProperties.getPassword());
-        connection = databaseManager.connection;
+        this.connection = databaseManager.connection;
     }
 
     //Save a new Article to database
@@ -71,7 +71,7 @@ public class UserDAO implements IUserDAO {
         User user = null;
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
-            
+            statement.setLong(1, ID);
             ResultSet result = statement.executeQuery();
             //Create new Article Object using results from statement above
             while (result.next()) {
@@ -79,8 +79,8 @@ public class UserDAO implements IUserDAO {
                 //...check user role and...
                 Roles userRole = null;
                 switch (result.getString("role")) {
-                    case "user" -> userRole = Roles.USER;
-                    case "moderator" -> userRole = Roles.MODERATOR;
+                    case "USER" -> userRole = Roles.USER;
+                    case "MODERATOR" -> userRole = Roles.MODERATOR;
                 }
                 //...create new Article Object
                 user = new User(
@@ -99,16 +99,46 @@ public class UserDAO implements IUserDAO {
         {
             log.error(e.getMessage());
         }
+        return user;
+    }
 
-        //Return filtered article
-        if(user != null)
+    //Search specific User by using id as filter
+    @Override
+    public User readName(String username) {
+        //SQL Statement to filter User where id equals parameter ID
+        String readSQL = "Select * FROM users WHERE name = ?;";
+        //User placeholder
+        User user = null;
+        //Execute statement
+        try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
+            statement.setString(1, username);
+            ResultSet result = statement.executeQuery();
+            //Create new Article Object using results from statement above
+            while (result.next()) {
+                //For every entry...
+                //...check user role and...
+                Roles userRole = null;
+                switch (result.getString("role")) {
+                    case "user" -> userRole = Roles.USER;
+                    case "moderator" -> userRole = Roles.MODERATOR;
+                }
+                //...create new Article Object
+                user = new User(
+                        result.getString("name"),
+                        result.getString("password"),
+                        userRole,
+                        result.getString("profile_image_path"),
+                        result.getString("created_at"),
+                        result.getString("deleted_at"),
+                        result.getBoolean("is_Banned")
+                );
+            }
+        }   
+        catch (SQLException e) 
         {
-            return user;
-        } 
-        else 
-        {
-            throw new NullPointerException("User not found!");
+            log.error(e.getMessage());
         }
+        return user;
     }
 
     //Update existing User based on id

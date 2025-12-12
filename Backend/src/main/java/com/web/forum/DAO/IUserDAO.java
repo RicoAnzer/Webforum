@@ -9,6 +9,8 @@ public interface IUserDAO {
     public ResponseEntity<String> create(User user);
     //Find specific User based on id
     public User read(Long ID);
+    //Find specific User based on username
+    public User readName(String username);
     //Update existing User
     public ResponseEntity<String> update(User user, Long userId);
     //Delete existing User

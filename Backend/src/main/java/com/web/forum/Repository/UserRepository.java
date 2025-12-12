@@ -29,6 +29,12 @@ public class UserRepository implements IUserRepository {
         return userDAO.read(ID);
     }
 
+    //Show User in database by username
+    @Override
+    public User findByName(String username) {
+        return userDAO.readName(username);
+    }
+
     //Update existing User
     @Override
     public ResponseEntity<String> change(User user, Long userId) {

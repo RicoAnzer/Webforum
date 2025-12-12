@@ -3,6 +3,7 @@ package com.web.forum.Entity;
 import com.web.forum.Roles;
 
 //No JPA used in this project => repository and dao done manually
+//Entity class for User
 public class User {
 
     private String name;

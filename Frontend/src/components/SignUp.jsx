@@ -1,52 +1,65 @@
-import React, { useState } from 'react';
-import { useNavigate} from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../Styles/SignUp.css';
 
-function SignUp () {
-   const [name, setName] = useState("");
-   const [password, setPassword] = useState("");
-   const [passwordConfirm, setPasswordConfirm] = useState("");
-   return ( 
-      <div className="register-container">
-        <h1 className='headline'>Registrieren</h1>
-        <form className="register-form" onSubmit={e => e.preventDefault()}>
-          <div className="form-group">
-            <label className='secondary-text' htmlFor="name">Name</label>
-            <input type="text" 
-                   id="name" 
-                   name="name" 
-                   placeholder="Dein Name" 
-                   onChange={(e) => setName(e.target.value)} />
-          </div>
-   
-          <div className="form-group">
-            <label className='secondary-text' htmlFor="password">Passwort</label>
-            <input type="password" 
-                   id="password" 
-                   name="password" 
-                   placeholder="Passwort" 
-                   onChange={(e) => setPassword(e.target.value)} 
-                   />
-          </div>
-   
-          <div className="form-group">
-            <label className='secondary-text' htmlFor="confirmPassword">Passwort wiederholen</label>
-            <input type="password" 
-                   id="confirmPassword" 
-                   name="confirmPassword" 
-                   placeholder="Passwort bestätigen" 
-                   onChange={(e) => setPasswordConfirm(e.target.value)} 
-                   />
-          </div>
-   
-          <button type="submit" className="submit-btn">Registrieren</button>
-        </form>
+function SignUp() {
+  const history = useNavigate();
+  function signUp(formData) {
+    const username = formData.get("name");
+    const userPassword = formData.get("password");
+    const confirmUserPassword = formData.get("confirmPassword");
 
-        <div className="hint">
-            Bereits registriert? <a href="/">Einloggen</a>
+    const header = {
+      'Content-Type': 'application/json'
+    }
+    const response = axios
+      .post("https://localhost:8080/auth/register", { name: username, password: userPassword }, {
+        withCredentials: true,
+        headers: header,
+        params: { confirmPassword: confirmUserPassword }
+      }).then(response => {
+        history('/');
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+  return (
+    <div className="register-container">
+      <h1 className='headline'>Registrieren</h1>
+      <form className="register-form" action={signUp}>
+        <div className="form-group">
+          <label className='secondary-text' name="name">Name</label>
+          <input type="text"
+            id="name"
+            name="name"
+            placeholder="Dein Name" />
         </div>
+
+        <div className="form-group">
+          <label className='secondary-text' name="password">Passwort</label>
+          <input type="password"
+            id="password"
+            name="password"
+            placeholder="Passwort" />
+        </div>
+
+        <div className="form-group">
+          <label className='secondary-text' name="confirmPassword">Passwort wiederholen</label>
+          <input type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Passwort bestätigen" />
+        </div>
+
+        <button type="submit" className="submit-btn">Registrieren</button>
+      </form>
+
+      <div className="hint">
+        Bereits registriert? <a href="/">Einloggen</a>
       </div>
-    );
+    </div>
+  );
 }
 
 export default SignUp;

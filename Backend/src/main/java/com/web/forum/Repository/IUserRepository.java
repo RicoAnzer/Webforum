@@ -10,6 +10,8 @@ public interface IUserRepository {
     public ResponseEntity<String> save(User user);
     //Find specific User based on id
     public User findById(Long ID);
+    //Find specific User based on username
+    public User findByName(String username);
     //Update existing User
     public ResponseEntity<String> change(User user, Long userId);
     //Delete existing User
