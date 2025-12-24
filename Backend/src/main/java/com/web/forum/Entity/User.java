@@ -1,24 +1,23 @@
 package com.web.forum.Entity;
 
-import com.web.forum.Roles;
+import java.util.List;
 
-//No JPA used in this project => repository and dao done manually
-//Entity class for User
+//Entity class for User => All User information for Frontend
 public class User {
 
+    private Long id;
     private String name;
-    private String password;
-    private Roles role;
+    private List<String> roles;
     private String profileImagePath;
     private final String createdAt;
     private String deletedAt;
     private Boolean isBanned;
 
     //Constructor
-    public User(String name, String password, Roles role, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
+    public User(Long id, String name, List<String> roles, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
+        this.id = id;
         this.name = name;
-        this.password = password;
-        this.role = role;
+        this.roles = roles;
         this.profileImagePath = profileImagePath;
         this.createdAt = createdAt;
         this.deletedAt = deletedAt;
@@ -26,16 +25,16 @@ public class User {
     }
 
     //Getters
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public Roles getRole() {
-        return role;
+    public List<String> getRoles() {
+        return roles;
     }
 
     public String getProfileImagePath() {
@@ -55,16 +54,16 @@ public class User {
     }
 
     //Setters
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Roles setRole(Roles role) {
-        return this.role = role;
+    public List<String> setRoles(List<String> roles) {
+        return this.roles = roles;
     }
 
     public void setProfileImagePath(String profileImagePath) {

@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "ForumApplication",
+            "request": "launch",
+            "mainClass": "com.web.forum.ForumApplication",
+            "projectName": "Backend"
+        },
+        {
             "type": "firefox",
             "request": "attach",
             "name": "Attach"

@@ -8,14 +8,13 @@ function Landing() {
     'Content-Type': 'application/json'
   }
 
-
   function logout() {
     const logoutResponse = axios
       .post("https://localhost:8080/auth/logout", {}, {
         withCredentials: true,
         headers: header
       }).then(response => {
-        history('/');
+        history('/login');
       })
       .catch(error => {
         console.log(error);

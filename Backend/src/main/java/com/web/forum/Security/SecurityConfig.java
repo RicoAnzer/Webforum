@@ -3,6 +3,7 @@ package com.web.forum.Security;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,26 +16,23 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-//Security Config filter
+//Security Config for SpringSecurity CORS and Requests
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //JwtAuthFilter
-    private final JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
 
-    //Constructor
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    }
-
-    //Assign JwtAuthFilter and CORS, manage React -> Spring Boot CORS and request authorization
+    //Assign JwtAuthFilter and CORS -> Spring Boot CORS and request authorization
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
-                // Allow everyone access to registration and login => for logout authorization is necessary
-                .requestMatchers("/auth/register", "/auth/login").permitAll()
+                //Allow everyone access to registration and login
+                .requestMatchers("/auth/register", "/auth/login", "/topic/*", "/role/*").permitAll()
+                //For logout user must have Role "USER" => Has to be logged in
+                .requestMatchers("/auth/logout").hasRole("USER")
                 //Must be logged in for everything else
                 .anyRequest().authenticated()
                 )

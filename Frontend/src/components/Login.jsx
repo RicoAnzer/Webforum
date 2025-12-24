@@ -12,11 +12,12 @@ function Login() {
       'Content-Type': 'application/json'
     }
     const response = axios
-      .post("https://localhost:8080/auth/login", { name: varname, password: varpassword }, {
+      .post("https://localhost:8080/auth/login", { username: varname, password: varpassword }, {
         withCredentials: true,
         headers: header
       }).then(response => {
-        history('/landing');
+        console.log(response.data);
+        history('/');
       })
       .catch(error => {
         console.log(error);

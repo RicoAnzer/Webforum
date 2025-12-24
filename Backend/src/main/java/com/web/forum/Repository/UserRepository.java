@@ -1,32 +1,30 @@
 package com.web.forum.Repository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.UserDAO;
+import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.User;
+import com.web.forum.Repository.Interfaces.IUserRepository;
 
 @Repository
 public class UserRepository implements IUserRepository {
 
-    //UserDAO
-    private final UserDAO userDAO;
-
-    //Constructor
-    public UserRepository(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
+    @Autowired
+    private UserDAO userDAO;
 
     //Save a new User to database
     @Override
-    public ResponseEntity<String> save(User user) {
-        return userDAO.create(user);
+    public ResponseEntity<String> save(User user, String password) {
+        return userDAO.create(user, password);
     }
 
-    //Show User in database by id
     @Override
-    public User findById(Long ID) {
-        return userDAO.read(ID);
+    //Show User in database by username
+    public LoginCredentials findCredByName(String username) {
+        return userDAO.readLoginCredentials(username);
     }
 
     //Show User in database by username
@@ -37,14 +35,13 @@ public class UserRepository implements IUserRepository {
 
     //Update existing User
     @Override
-    public ResponseEntity<String> change(User user, Long userId) {
-        return userDAO.update(user, userId);
+    public ResponseEntity<String> change(Long ID, User user) {
+        return userDAO.update(ID, user);
     }
 
     //Delete existing User in database
     @Override
-    public ResponseEntity<String> remove(Long ID) {
-        return userDAO.delete(ID);
+    public ResponseEntity<String> remove(String username) {
+        return userDAO.delete(username);
     }
-    
 }

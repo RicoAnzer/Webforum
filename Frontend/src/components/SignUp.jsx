@@ -5,7 +5,7 @@ import '../Styles/SignUp.css';
 function SignUp() {
   const history = useNavigate();
   function signUp(formData) {
-    const username = formData.get("name");
+    const name = formData.get("name");
     const userPassword = formData.get("password");
     const confirmUserPassword = formData.get("confirmPassword");
 
@@ -13,12 +13,11 @@ function SignUp() {
       'Content-Type': 'application/json'
     }
     const response = axios
-      .post("https://localhost:8080/auth/register", { name: username, password: userPassword }, {
+      .post("https://localhost:8080/auth/register", {username: name, password: userPassword, confirmedPassword: confirmUserPassword}, {
         withCredentials: true,
-        headers: header,
-        params: { confirmPassword: confirmUserPassword }
+        headers: header
       }).then(response => {
-        history('/');
+        history('/login');
       })
       .catch(error => {
         console.log(error);
@@ -56,7 +55,7 @@ function SignUp() {
       </form>
 
       <div className="hint">
-        Bereits registriert? <a href="/">Einloggen</a>
+        Bereits registriert? <a href="/login">Einloggen</a>
       </div>
     </div>
   );

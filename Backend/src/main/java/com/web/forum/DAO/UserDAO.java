@@ -4,138 +4,115 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
-import com.web.forum.Configurations.PostgresProperties;
-import com.web.forum.Database.DatabaseManager;
+import com.web.forum.DAO.Interfaces.IUserDAO;
+import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.User;
-import com.web.forum.Roles;
+import com.web.forum.ForumApplication;
 
 @Repository
 public class UserDAO implements IUserDAO {
 
-    //Logger
     private static final Logger log = LoggerFactory.getLogger(UserDAO.class);
-    //Connection
     private final Connection connection;
 
+    @Autowired
+    private UserRoleDAO userRoleDAO;
+
     //Constructor
-    public UserDAO(DatabaseManager databaseManager, PostgresProperties postgresProperties)
-    {
-        databaseManager.startDatabase(postgresProperties.getUrl(), postgresProperties.getUsername(), postgresProperties.getPassword());
-        this.connection = databaseManager.connection;
+    public UserDAO(ForumApplication forumApplication) {
+        //Connect to database;
+        this.connection = forumApplication.connection;
     }
 
-    //Save a new Article to database
+    //Save a new User to database
     @Override
-    public ResponseEntity<String> create(User user) {
+    public ResponseEntity<String> create(User user, String password) {
         //SQL Statement to add new users to database
-        String createSQL = "INSERT INTO users (name, password, role, profile_image_path, created_at, deleted_at, is_banned)" +
-               "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String createSQL = "INSERT INTO users (name, password, profile_image_path, created_at, deleted_at, is_banned)"
+                + "VALUES (?, ?, ?, ?, ?, ?);";
 
         //Execute statement
-        try (PreparedStatement statement = connection.prepareStatement(createSQL)) 
-        {
+        try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
             //At creation of User 
             //=> id is automatically created inside database, doesn't need to be set here
             //=> isBanned is false at default, doesn't need to be set here
             //=> deletedAt should be null at creation, set date only after User deleted account
             statement.setString(1, user.getName());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole().name());
-            statement.setString(4, user.getProfileImagePath());
-            statement.setString(5, user.getCreatedAt());
-            statement.setString(6, user.getDeletedAt());
-            statement.setBoolean(7, user.getIsBanned());
+            statement.setString(2, password);
+            statement.setString(3, user.getProfileImagePath());
+            statement.setString(4, user.getCreatedAt());
+            statement.setString(5, user.getDeletedAt());
+            statement.setBoolean(6, user.getIsBanned());
             statement.executeUpdate();
-        } 
-        catch (SQLException e) 
-        {
+        } catch (SQLException e) {
             log.error(e.getMessage());
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create user");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create user");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("User '" + user.getName() + "' created");
     }
 
     //Search specific User by using id as filter
     @Override
-    public User read(Long ID) {
+    public LoginCredentials readLoginCredentials(String username) {
         //SQL Statement to filter User where id equals parameter ID
-        String readSQL = "Select * FROM users WHERE id = ?;";
-        //User placeholder
-        User user = null;
+        String readLoginSQL = "Select * FROM users WHERE name = ?;";
+        //Initialize LoginCredentials object
+        LoginCredentials credentials = null;
         //Execute statement
-        try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
-            statement.setLong(1, ID);
+        try (PreparedStatement statement = connection.prepareStatement(readLoginSQL)) {
+            statement.setString(1, username);
             ResultSet result = statement.executeQuery();
-            //Create new Article Object using results from statement above
             while (result.next()) {
                 //For every entry...
-                //...check user role and...
-                Roles userRole = null;
-                switch (result.getString("role")) {
-                    case "USER" -> userRole = Roles.USER;
-                    case "MODERATOR" -> userRole = Roles.MODERATOR;
-                }
-                //...create new Article Object
-                user = new User(
-
+                //...create new LoginCredentials Object
+                credentials = new LoginCredentials(
+                        result.getLong("id"),
                         result.getString("name"),
-                        result.getString("password"),
-                        userRole,
-                        result.getString("profile_image_path"),
-                        result.getString("created_at"),
-                        result.getString("deleted_at"),
-                        result.getBoolean("is_Banned")
+                        result.getString("password")
                 );
             }
-        }   
-        catch (SQLException e) 
-        {
+        } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return user;
+        return credentials;
     }
 
     //Search specific User by using id as filter
     @Override
     public User readName(String username) {
-        //SQL Statement to filter User where id equals parameter ID
+        //SQL Statement to filter User where name equals parameter username
         String readSQL = "Select * FROM users WHERE name = ?;";
-        //User placeholder
         User user = null;
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
-            //Create new Article Object using results from statement above
+            //Create new User Object using results from statement above
+            //For every entry...
             while (result.next()) {
-                //For every entry...
-                //...check user role and...
-                Roles userRole = null;
-                switch (result.getString("role")) {
-                    case "user" -> userRole = Roles.USER;
-                    case "moderator" -> userRole = Roles.MODERATOR;
-                }
-                //...create new Article Object
+                //...use placeholder List => must be later replaced using UserRoleRepository...
+                List<String> roles = userRoleDAO.readById(result.getLong("id"));
+                //...and create new User Object
                 user = new User(
+                        result.getLong("id"),
                         result.getString("name"),
-                        result.getString("password"),
-                        userRole,
+                        roles,
                         result.getString("profile_image_path"),
                         result.getString("created_at"),
                         result.getString("deleted_at"),
                         result.getBoolean("is_Banned")
                 );
             }
-        }   
-        catch (SQLException e) 
-        {
+        } catch (SQLException e) {
             log.error(e.getMessage());
         }
         return user;
@@ -143,28 +120,23 @@ public class UserDAO implements IUserDAO {
 
     //Update existing User based on id
     @Override
-    public ResponseEntity<String> update(User user, Long userId) {
+    public ResponseEntity<String> update(Long ID, User user) {
 
         //To change User:
         //=> User Object = Object containing changed settings
         //=> userId = id of to changing User
         //=> Fields id, profileImagePath and createdAt are unchangeable
-
-        //SQL Statement to add new Article to database
-        String updateSQL = "UPDATE users SET name = ?, password = ?, role = ?, deleted_at = ?, is_banned " +
-                        "WHERE id = ?;";
+        //SQL Statement to add new User to database
+        String updateSQL = "UPDATE users SET name = ?, deleted_at = ?, is_banned = ? "
+                + "WHERE id = ?;";
         //Execute statement
-        try (PreparedStatement statement = connection.prepareStatement(updateSQL)) 
-        {
+        try (PreparedStatement statement = connection.prepareStatement(updateSQL)) {
             statement.setString(1, user.getName());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getRole().toString());
-            statement.setString(4, user.getDeletedAt());
-            statement.setBoolean(5, user.getIsBanned());
-            statement.setLong(6, userId);
+            statement.setString(2, user.getDeletedAt());
+            statement.setBoolean(3, user.getIsBanned());
+            statement.setLong(4, ID);
             statement.executeUpdate();
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't change user");
             log.error(e.getMessage());
         }
@@ -173,19 +145,19 @@ public class UserDAO implements IUserDAO {
 
     }
 
-    //Delete existing User based on id
+    //Delete existing Topic based on id
     @Override
-    public ResponseEntity<String> delete(Long ID) {
+    public ResponseEntity<String> delete(String name) {
         //SQL Statement to delete User
-        String deleteSQL = "DELETE FROM users WHERE id = ? ";
+        String deleteSQL = "DELETE FROM users WHERE name = ?;";
         //execute statement
-         try(PreparedStatement statement = connection.prepareStatement(deleteSQL)){
+        try (PreparedStatement statement = connection.prepareStatement(deleteSQL)) {
+            statement.setString(1, name);
             statement.executeUpdate();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error(e.getMessage());
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
         }
-        return  ResponseEntity.status(HttpStatus.OK).body("User deleted");
+        return ResponseEntity.status(HttpStatus.OK).body("User deleted");
     }
 }
