@@ -50,7 +50,7 @@ public class UserRoleDAO implements IUserRoleDAO {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create user role");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Can't connect user to role");
+        return ResponseEntity.status(HttpStatus.CREATED).body("User connection created");
     }
 
     //Find all Roles of specific User by id

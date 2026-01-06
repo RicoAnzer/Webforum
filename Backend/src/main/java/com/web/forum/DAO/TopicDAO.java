@@ -36,17 +36,21 @@ public class TopicDAO implements ITopicDAO {
         String createSQL = "INSERT INTO topics (name)"
                 + "VALUES (?);";
 
-        //Execute statement
-        try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
-            //At creation of Topic 
-            //=> id is automatically created inside database, doesn't need to be set here
-            statement.setString(1, name);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create topic");
+        if (readbyName(name) == null) {
+            //Execute statement
+            try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
+                //At creation of Topic 
+                //=> id is automatically created inside database, doesn't need to be set here
+                statement.setString(1, name);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                log.error(e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create topic");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body("Topic '" + name + "' created");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Topic '" + name + "' created");
     }
 
     //Search and return Topics based on ID
@@ -59,6 +63,33 @@ public class TopicDAO implements ITopicDAO {
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
             statement.setLong(1, ID);
+            ResultSet result = statement.executeQuery();
+            //Create new Article Object using results from statement above
+            while (result.next()) {
+                //For every entry...
+                //...create new Topic Object...
+                topic = new Topic(
+                        result.getLong("id"),
+                        result.getString("name")
+                );
+
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
+        return topic;
+    }
+
+    //Find and return Topic in database based on name
+    @Override
+    public Topic readbyName(String name) {
+        //SQL Statement to return all Topics
+        String readSQL = "Select * FROM topics WHERE name = ?;";
+        //Topic placeholder
+        Topic topic = null;
+        //Execute statement
+        try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
+            statement.setString(1, name);
             ResultSet result = statement.executeQuery();
             //Create new Article Object using results from statement above
             while (result.next()) {

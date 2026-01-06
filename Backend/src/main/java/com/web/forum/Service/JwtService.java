@@ -13,6 +13,8 @@ import com.web.forum.Security.JwtConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 //All methods for jwt token handling
 @Service
@@ -49,6 +51,23 @@ public class JwtService {
         //Check current date => If current date is after expiration isTokenExpired() = true
         Date now = Date.from(Instant.now());
         return claims.getExpiration().before(now);
+    }
+
+    //Check if user is logged in
+    public Boolean isLoggedIn(HttpServletRequest request) {
+        String jwtToken = null;
+        // Check for jwt token in cookies
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwtToken".equals(cookie.getName())) {
+                    //Extract jwt token
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        // If token is not missing and not expired, return true
+        return !(jwtToken == null || isTokenExpired(jwtToken));
     }
 
     //Extract all claims out of jwt token

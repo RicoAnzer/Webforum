@@ -35,8 +35,8 @@ public class UserRepository implements IUserRepository {
 
     //Update existing User
     @Override
-    public ResponseEntity<String> change(Long ID, User user) {
-        return userDAO.update(ID, user);
+    public ResponseEntity<?> change(User user) {
+        return userDAO.update(user);
     }
 
     //Delete existing User in database

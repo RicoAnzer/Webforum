@@ -18,7 +18,7 @@ public interface IUserRepository {
     public User findByName(String username);
 
     //Update existing User
-    public ResponseEntity<String> change(Long ID, User user);
+    public ResponseEntity<?> change(User user);
 
     //Delete existing User
     public ResponseEntity<String> remove(String username);

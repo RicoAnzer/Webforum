@@ -17,7 +17,7 @@ public interface IUserDAO {
     public User readName(String username);
 
     //Update existing User
-    public ResponseEntity<String> update(Long ID, User user);
+    public ResponseEntity<?> update(User user);
 
     //Delete existing User
     public ResponseEntity<String> delete(String name);

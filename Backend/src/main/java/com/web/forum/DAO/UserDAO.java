@@ -120,11 +120,9 @@ public class UserDAO implements IUserDAO {
 
     //Update existing User based on id
     @Override
-    public ResponseEntity<String> update(Long ID, User user) {
-
+    public ResponseEntity<?> update(User user) {
         //To change User:
         //=> User Object = Object containing changed settings
-        //=> userId = id of to changing User
         //=> Fields id, profileImagePath and createdAt are unchangeable
         //SQL Statement to add new User to database
         String updateSQL = "UPDATE users SET name = ?, deleted_at = ?, is_banned = ? "
@@ -134,15 +132,12 @@ public class UserDAO implements IUserDAO {
             statement.setString(1, user.getName());
             statement.setString(2, user.getDeletedAt());
             statement.setBoolean(3, user.getIsBanned());
-            statement.setLong(4, ID);
+            statement.setLong(4, user.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't change user");
             log.error(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body("User '" + user.getName() + "' changed");
-
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     //Delete existing Topic based on id
@@ -156,8 +151,8 @@ public class UserDAO implements IUserDAO {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User '" + name + "' not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body("User deleted");
+        return ResponseEntity.status(HttpStatus.OK).body("Deleted User '" + name + "'");
     }
 }

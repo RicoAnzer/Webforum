@@ -6,8 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.forum.Entity.User;
@@ -31,14 +32,30 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(user);
         } else {
             //If user = null => Error
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't find user '" + user + "'");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User '" + username + "' not found");
+        }
+    }
+
+    //Update user
+    @PutMapping("/update/{oldUserName}")
+    public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody User newUser) {
+        User user = userRepository.findByName(oldUserName);
+        //Check if user exists
+        if (user != null) {
+            //Check if new name already belongs to another user
+            if (userRepository.findByName(newUser.getName()) == null) {
+                return userRepository.change(newUser);
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("An User with this name already exists");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User '" + oldUserName + "' not found");
         }
     }
 
     //Delete an User by username
     @DeleteMapping("/delete/{username}")
-    public ResponseEntity<?> deleteUser(@RequestParam String username) {
-        userRepository.remove(username);
-        return ResponseEntity.status(HttpStatus.OK).body("Deleted User '" + username + "'");
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        return userRepository.remove(username);
     }
 }

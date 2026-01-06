@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.forum.Entity.Topic;
@@ -23,18 +23,9 @@ public class TopicController {
     private TopicRepository topicRepository;
 
     //Add a new Topic
-    @GetMapping("/add/{name}")
+    @PostMapping("/add/{name}")
     public ResponseEntity<?> addTopic(@PathVariable String name) {
-
-        try {
-            //Add topic
-            topicRepository.save(name);
-        } catch (Exception e) {
-            //If not matching => error
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't add topic");
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("Topic " + name + " added");
+        return topicRepository.save(name);
     }
 
     //Return all Topics
@@ -46,23 +37,25 @@ public class TopicController {
             //Return topics list
             return ResponseEntity.status(HttpStatus.OK).body(topics);
         } else {
-            //If no topics found => error
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No topics found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topics found");
         }
     }
 
-    //Return Topic by ID
-    @DeleteMapping("/get/{ID}")
-    public ResponseEntity<?> getTopicsByID(@RequestParam Long ID) {
-        //Get Topic by ID parameter
-        Topic topic = topicRepository.findByID(ID);
-        //If topic = null => topic doesn't exist
-        if (topic != null) {
-            //Return topic
-            return ResponseEntity.status(HttpStatus.OK).body(topic);
-        } else {
-            //If topic = null => Error
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't find user '" + topic + "'");
+    //Return Topic based on ID
+    @GetMapping("/get/{ID}")
+    public ResponseEntity<?> getTopic(@PathVariable Long ID) {
+        Topic foundTopic = topicRepository.findByID(ID);
+        if (foundTopic != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(foundTopic);
+        } else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topic found");
         }
+    }
+
+    //Deletes Topic by name
+    @DeleteMapping("/delete/{topicName}")
+    public ResponseEntity<?> deleteTopic(@PathVariable String topicName) {
+        //Deletes Topic by topicName parameter
+        return topicRepository.remove(topicName);
     }
 }

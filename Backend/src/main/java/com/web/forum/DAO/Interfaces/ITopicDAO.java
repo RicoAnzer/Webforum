@@ -17,6 +17,9 @@ public interface ITopicDAO {
     //Find and return Topic in database based on ID
     public Topic readbyID(Long ID);
 
+    //Find and return Topic in database based on name
+    public Topic readbyName(String name);
+
     //Delete existing Topic
     public ResponseEntity<String> delete(String name);
 }

@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
                 //Encode password
                 String encodedPassword = passwordEncoder().encode(password);
                 //Format createdAt to "dd-MM-YYYY"
-                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 //Id null to auto generate id at database
                 Long id = null;
 
@@ -124,14 +124,14 @@ public class UserService implements UserDetailsService {
                     //Bind Role "USER" to user
                     userRoleRepository.save(createdUser.getId(), role.getId());
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't bind User to Role");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't bind User to Role");
                 }
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
 
             } else {
                 //If name already in database => error
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
             }
 
         } else {
@@ -146,7 +146,7 @@ public class UserService implements UserDetailsService {
         int expiryInterval = 24 * 60 * 60;
 
         //If user is already logged in => error
-        if (isLoggedIn(request)) {
+        if (jwtService.isLoggedIn(request)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User " + loginCredentials.getUsername() + " is already logged in");
         }
 
@@ -168,23 +168,6 @@ public class UserService implements UserDetailsService {
 
         // Return success response and user Object for frontend processing
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(loggedInUser);
-    }
-
-    //Check if user is logged in
-    public Boolean isLoggedIn(HttpServletRequest request) {
-        String jwtToken = null;
-        // Check for jwt token in cookies
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwtToken".equals(cookie.getName())) {
-                    //Extract jwt token
-                    jwtToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        // If token is not missing and not expired, return true
-        return !(jwtToken == null || jwtService.isTokenExpired(jwtToken));
     }
 
     //Logout user by deleting jwt token

@@ -1,7 +1,6 @@
 package com.web.forum.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +20,12 @@ public class RoleController {
     //Add new Role
     @PostMapping("/add/{roleName}")
     public ResponseEntity<?> addRole(@PathVariable String roleName) {
-        roleRepository.save(roleName);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Created Role '" + roleName + "'");
+        return roleRepository.save(roleName);
     }
 
     //Delete existing Role
     @DeleteMapping("/delete/{roleName}")
     public ResponseEntity<?> deleteRole(@PathVariable String roleName) {
-        roleRepository.remove(roleName);
-        return ResponseEntity.status(HttpStatus.OK).body("Deleted User '" + roleName + "'");
+        return roleRepository.remove(roleName);
     }
 }

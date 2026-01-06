@@ -60,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String jwtToken = null;
 
         // Check if logged in
-        if (!userService.isLoggedIn(request)) {
+        if (!jwtService.isLoggedIn(request)) {
             logger.info("No token, not logged in");
             return;
             //If logged in => extract jwt token
@@ -99,5 +99,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Store authentication token for application to use
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
-
 }
