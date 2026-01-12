@@ -11,7 +11,4 @@ public interface IUserRoleDAO {
 
     //Find all Roles of specific User by id
     public List<String> readById(Long userId);
-
-    //Delete existing user role
-    public ResponseEntity<String> delete(Long userID, int roleID);
 }

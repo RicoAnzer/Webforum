@@ -5,13 +5,13 @@ import java.util.List;
 //Entity class for User => All User information for Frontend
 public class User {
 
-    private Long id;
-    private String name;
-    private List<String> roles;
-    private String profileImagePath;
+    private final Long id;
+    private final String name;
+    private final List<String> roles;
+    private final String profileImagePath;
     private final String createdAt;
-    private String deletedAt;
-    private Boolean isBanned;
+    private final String deletedAt;
+    private final Boolean isBanned;
 
     //Constructor
     public User(Long id, String name, List<String> roles, String profileImagePath, String createdAt, String deletedAt, Boolean isBanned) {
@@ -51,30 +51,5 @@ public class User {
 
     public Boolean getIsBanned() {
         return isBanned;
-    }
-
-    //Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<String> setRoles(List<String> roles) {
-        return this.roles = roles;
-    }
-
-    public void setProfileImagePath(String profileImagePath) {
-        this.profileImagePath = profileImagePath;
-    }
-
-    public void setDeletedAt(String deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public void setIsBanned(Boolean isBanned) {
-        this.isBanned = isBanned;
     }
 }

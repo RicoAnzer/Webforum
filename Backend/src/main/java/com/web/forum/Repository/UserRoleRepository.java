@@ -26,10 +26,4 @@ public class UserRoleRepository implements IUserRoleRepository {
     public List<String> findById(Long userId) {
         return userRoleDAO.readById(userId);
     }
-
-    //Delete existing user role
-    @Override
-    public ResponseEntity<String> remove(Long userID, int roleID) {
-        return userRoleDAO.delete(userID, roleID);
-    }
 }

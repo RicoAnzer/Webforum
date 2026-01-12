@@ -11,7 +11,4 @@ public interface IUserRoleRepository {
 
     //Find all Roles of specific User by id
     public List<String> findById(Long userId);
-
-    //Delete existing user role
-    public ResponseEntity<String> remove(Long userID, int roleID);
 }

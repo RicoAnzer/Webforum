@@ -3,8 +3,8 @@ package com.web.forum.Entity;
 //Entity class for Topic (headline for Threads of similiar theme) => All information for Frontend
 public class Topic {
 
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
 
     //Constructor
     public Topic(Long id, String name) {
@@ -20,14 +20,4 @@ public class Topic {
     public String getName() {
         return name;
     }
-
-    //Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

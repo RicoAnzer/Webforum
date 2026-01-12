@@ -76,22 +76,4 @@ public class UserRoleDAO implements IUserRoleDAO {
         }
         return roles;
     }
-
-    //Delete existing user role
-    @Override
-    public ResponseEntity<String> delete(Long userID, int roleID) {
-        //SQL Statement to delete Role
-        String deleteSQL = "DELETE FROM roles WHERE user_id = ? AND role_id = ? "
-                + "VALUES (?, ?);";
-        //execute statement
-        try (PreparedStatement statement = connection.prepareStatement(deleteSQL)) {
-            statement.setLong(1, userID);
-            statement.setLong(2, roleID);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User or Role not found");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body("User or Role not found");
-    }
 }

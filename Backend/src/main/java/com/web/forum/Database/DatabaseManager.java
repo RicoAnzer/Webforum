@@ -101,10 +101,4 @@ public class DatabaseManager {
             log.error(e.getMessage());
         }
     }
-
-    //Close database connection
-    public void closeDatabase() throws SQLException {
-        connection.close();
-    }
-
 }
