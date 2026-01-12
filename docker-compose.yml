@@ -1,0 +1,66 @@
+services:
+  #Backend: Spring Boot application
+  spring:
+    #Use Dockerfile in /Backend
+    build:
+      context: ./Backend
+    hostname: backend-spring
+    container_name: spring-boot
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    #Overwrite application.properties to run in docker
+    #=> Enable devtools to enable hot reload
+    #=> Overwrite jdbc url: Replace localhost by hostname of postgres container
+    environment:
+      - SPRING_DEV_TOOLS_RESTART_ENABLED=true
+      - spring.datasource.url=jdbc:postgresql://backend-postgres:${POSTGRES_PORT}/${POSTGRES_DB_NAME}
+    #Mount Backend source code into container
+    volumes:
+      - ./Backend:/app/Backend/
+    depends_on:
+      - db
+  #Backend: Postgres database
+  db:
+    image: postgres
+    hostname: backend-postgres
+    container_name: postgres
+    healthcheck:
+    #Check if connection to database works
+       test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB_NAME} -U postgres"]
+       interval: 10s
+       timeout: 5s
+       retries: 5
+    #Create and connect to database at start
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+    env_file:
+      - .env
+    #First: Use dump file to create database
+    #Second Save database in named volume for persistency
+    volumes:
+      - ./Backend/src/main/java/com/web/forum/Database/Dump file:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/
+    expose:
+      - 5432
+  #Frontend: React application
+  react:
+    #Use Dockerfile in /Frontend
+    build: 
+      context: ./Frontend
+    hostname: frontend-react
+    container_name: react
+    #Check if all dependencies installed (npm install) and run application
+    command: sh -c "cd /app/Frontend && npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    #Mount Frontend source code into container
+    volumes:
+      - ./Frontend:/app/Frontend
+    depends_on:
+      - spring
+volumes:
+  pgdata:
