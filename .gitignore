@@ -1,0 +1,61 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+*.env
+*keystore.p12
+
+### STS ###
+/Backend/.apt_generated
+/Backend/.classpath
+/Backend/.factorypath
+/Backend/.project
+/Backend/.settings
+/Backend/.springBeans
+/Backend/.sts4-cache
+/Backend/bin/
+/Backend/!**/src/main/**/bin/
+/Backend/!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+/Backend/.idea
+/Backend/*.iws
+/Backend/*.iml
+/Backend/*.ipr
+/Backend/out/
+/Backend/!**/src/main/**/out/
+/Backend/!**/src/test/**/out/
+
+### NetBeans ###
+/Backend/nbproject/private/
+/Backend/nbbuild/
+/Backend/dist/
+/Backend/nbdist/
+/Backend/.nb-gradle/
+
+# Logs
+/Frontend/logs
+/Frontend/*.log
+/Frontend/npm-debug.log*
+/Frontend/yarn-debug.log*
+/Frontend/yarn-error.log*
+/Frontend/pnpm-debug.log*
+/Frontend/*lerna-debug.log*
+
+/Frontend/node_modules/
+/Frontend/dist
+/Frontend/dist-ssr
+/Frontend/*.local
+
+# Editor directories and files
+*.vscode/
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

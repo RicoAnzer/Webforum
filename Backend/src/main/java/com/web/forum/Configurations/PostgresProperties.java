@@ -3,7 +3,6 @@ package com.web.forum.Configurations;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 //Accesses values in application.properties to connect to database
-//Two databases, production and testing
 @ConfigurationProperties(prefix = "spring.datasource")
 public class PostgresProperties{
 

@@ -7,11 +7,6 @@
             "request": "launch",
             "mainClass": "com.web.forum.ForumApplication",
             "projectName": "Backend"
-        },
-        {
-            "type": "firefox",
-            "request": "attach",
-            "name": "Attach"
         }
     ]
 }
