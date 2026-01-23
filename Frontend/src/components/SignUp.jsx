@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../Styles/SignUp.css';
 
 function SignUp() {
-  const history = useNavigate();
+  const navigate = useNavigate();
   function signUp(formData) {
     const name = formData.get("name");
     const userPassword = formData.get("password");
@@ -17,7 +17,7 @@ function SignUp() {
         withCredentials: true,
         headers: header
       }).then(response => {
-        history('/login');
+        navigate('/login');
       })
       .catch(error => {
         console.log(error);
@@ -30,7 +30,6 @@ function SignUp() {
         <div className="form-group">
           <label className='secondary-text' name="name">Name</label>
           <input type="text"
-            id="name"
             name="name"
             placeholder="Dein Name" />
         </div>
@@ -38,7 +37,6 @@ function SignUp() {
         <div className="form-group">
           <label className='secondary-text' name="password">Passwort</label>
           <input type="password"
-            id="password"
             name="password"
             placeholder="Passwort" />
         </div>
@@ -46,7 +44,6 @@ function SignUp() {
         <div className="form-group">
           <label className='secondary-text' name="confirmPassword">Passwort wiederholen</label>
           <input type="password"
-            id="confirmPassword"
             name="confirmPassword"
             placeholder="Passwort bestätigen" />
         </div>

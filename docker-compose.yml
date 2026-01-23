@@ -8,17 +8,18 @@ services:
     container_name: spring-boot
     ports:
       - "8080:8080"
+      - "35729:35729"
     env_file:
       - .env
     #Overwrite application.properties to run in docker
     #=> Enable devtools to enable hot reload
     #=> Overwrite jdbc url: Replace localhost by hostname of postgres container
     environment:
-      - SPRING_DEV_TOOLS_RESTART_ENABLED=true
+      - GRADLE_USER_HOME=/Backend
       - spring.datasource.url=jdbc:postgresql://backend-postgres:${POSTGRES_PORT}/${POSTGRES_DB_NAME}
     #Mount Backend source code into container
     volumes:
-      - ./Backend:/app/Backend/
+     - ./Backend:/Backend
     depends_on:
       - db
   #Backend: Postgres database

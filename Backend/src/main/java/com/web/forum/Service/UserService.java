@@ -142,19 +142,29 @@ public class UserService implements UserDetailsService {
 
     //Login as user
     public ResponseEntity<?> userLogin(@RequestBody LoginCredentials loginCredentials, HttpServletRequest request, HttpServletResponse response) {
-        //Expiry interval for cookie = 1 Day
-        int expiryInterval = 24 * 60 * 60;
+        //Expiry interval for cookie = 1 Day in Milliseconds
+        int expiryInterval = 24 * 60 * 60 * 1000;
+        //Load user Object from database
+        com.web.forum.Entity.User loggedInUser = userRepository.findByName(loginCredentials.getUsername());
 
+        //If user doesn't exist in database => error
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        }
         //If user is already logged in => error
         if (jwtService.isLoggedIn(request)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User " + loginCredentials.getUsername() + " is already logged in");
         }
+        //If password is wrong => error
+        String encryptedPassword = userRepository.findCredByName(loginCredentials.getUsername()).getPassword();
+        if (!passwordEncoder().matches(loginCredentials.getPassword(), encryptedPassword)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password not found");
+        }
 
-        //Load user Object from database
-        com.web.forum.Entity.User loggedInUser = userRepository.findByName(loginCredentials.getUsername());
         //If username and password are correct => generate jwt token...
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
         log.info("Generate token: " + token);
+        log.info("Generate test2: ");
         //Send JWT token in an HTTP-Only cookie
         ResponseCookie cookie = ResponseCookie.
                 from("jwtToken", token)
@@ -179,7 +189,9 @@ public class UserService implements UserDetailsService {
                     //Extract jwt token
                     String jwtToken = cookie.getValue();
                     //Validate jwt token and delete if validated
-                    if (jwtToken != null || !jwtService.isTokenExpired(jwtToken)) {
+                    if (jwtToken != null
+                            || !jwtService.isTokenExpired(jwtToken)
+                            && userRepository.findByName(jwtService.getUserName(jwtToken)) != null) {
                         //Create new cookie with same name and maxAge to 0 => delete Cookie
                         ResponseCookie newCookie = ResponseCookie.from("jwtToken", "")
                                 .httpOnly(true)

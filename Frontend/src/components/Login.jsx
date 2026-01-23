@@ -1,38 +1,43 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react'
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../Styles/SignUp.css';
 
 function Login() {
-  const history = useNavigate();
-  function login(formData) {
-    const varname = formData.get("name");
-    const varpassword = formData.get("password");
 
-    const header = {
-      'Content-Type': 'application/json'
-    }
-    const response = axios
-      .post("https://localhost:8080/auth/login", { username: varname, password: varpassword }, {
+  //useNavigate() allows navigation to other pages
+  const navigate = useNavigate();
+  const header = {
+    'Content-Type': 'application/json'
+  }
+
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  async function useLogin(formData) {
+    const varname = formData.get('name');
+    const varpassword = formData.get('password');
+    return await axios
+      .post("https://localhost:8081/auth/login", { username: varname, password: varpassword }, {
         withCredentials: true,
         headers: header
       }).then(response => {
         console.log(response.data);
-        history('/');
+        navigate('/');
       })
       .catch(error => {
-        console.log(error);
+        setErrorMessage(error?.response?.data);
+        console.log(errorMessage);
       });
   }
 
   return (
     <div className="register-container">
       <h1 className='headline'>Anmelden</h1>
-
-      <form className="register-form" action={login}>
+      {errorMessage != null && <h1>{errorMessage}</h1>}
+      <form className="register-form" action={useLogin}>
         <div className="form-group">
           <label className='secondary-text' name="name">Name</label>
           <input type="text"
-            id="name"
             name="name"
             placeholder="Dein Name" />
         </div>
@@ -40,7 +45,6 @@ function Login() {
         <div className="form-group">
           <label className='secondary-text' name="password">Passwort</label>
           <input type="password"
-            id="password"
             name="password"
             placeholder="Passwort"
           />
