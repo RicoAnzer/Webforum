@@ -164,7 +164,6 @@ public class UserService implements UserDetailsService {
         //If username and password are correct => generate jwt token...
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
         log.info("Generate token: " + token);
-        log.info("Generate test2: ");
         //Send JWT token in an HTTP-Only cookie
         ResponseCookie cookie = ResponseCookie.
                 from("jwtToken", token)

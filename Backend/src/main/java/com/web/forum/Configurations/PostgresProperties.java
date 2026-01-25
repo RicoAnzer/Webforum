@@ -7,16 +7,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class PostgresProperties{
 
     //Initializes postgres database values
-    private final String url;
-    private final String username;
-    private final String password;
-
-    //Constructor
-    public PostgresProperties(String url, String username, String password) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-    }
+    private String url;
+    private String username;
+    private String password;
 
     //Getter
     public String getUrl() {
@@ -29,5 +22,18 @@ public class PostgresProperties{
 
     public String getPassword() {
         return password;
+    }
+
+    //Setter
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

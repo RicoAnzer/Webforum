@@ -4,17 +4,8 @@ build/
 !**/src/test/**/build/
 *.env
 *keystore.p12
-### Gradle ###
-#Spring Boot Gradle Files
-!gradle/wrapper/gradle-wrapper.jar
-.gradle
-#Docker Gradle files
-/Backend/.tmp
-/Backend/caches
-/Backend/daemon
-/Backend/native
-/Backend/notifications
-/Backend/wrapper
+### Maven ###
+/Backend/target
 ### STS ###
 /Backend/.apt_generated
 /Backend/.classpath
