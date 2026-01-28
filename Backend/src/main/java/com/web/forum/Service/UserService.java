@@ -84,7 +84,15 @@ public class UserService implements UserDetailsService {
 
         //Compare password and confirmPassword values
         if (password.equals(confirmedPassword)) {
-            //If matching => Check if username already exists (if it doesn't exist: findByName() == null)
+            //If username is empty => error
+            if ("".equals(username)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is empty");
+            }
+            //If username is too long => error
+            if (username.length() > 20) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose an username with less than 20 characters");
+            }
+            //Check if username already exists (if it doesn't exist: findByName() == null)
             if (userRepository.findByName(username) == null) {
                 //Encode password
                 String encodedPassword = passwordEncoder().encode(password);

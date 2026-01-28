@@ -1,24 +1,46 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
+import { FormattedMessage, IntlProvider } from 'react-intl';
+import { ErrorProvider } from './global-variables/ErrorManager.jsx'
 import './App.css'
+
+//Import routing pahes
 import LoginPage from './components/Login.jsx';
 import SignupPage from './components/SignUp.jsx';
 import Landing from "./components/Landing Page.jsx";
 
+//Import locale files containing translations
+import messages_en from './locales/en.json';
+import messages_de from './locales/de.json';
+//List locale files to iterate through to switch language
+const messages = {
+  en: messages_en,
+  de: messages_de,
+};
+
 function App() {
-  const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('');
+  //Starting language
+  const [state, setState] = useState({ locale: 'en' })
+  //Switch language
+  function handleLanguageChange() {
+    (e) => { this.setState({ locale: e.target.value }) }
+  }
+
   return (
-    <div className="main">
-     {user != null && <h1>Hello user.name</h1>}
-      <Router>
+    <ErrorProvider>
+      <IntlProvider locale={state.locale}
+        messages={messages[state.locale]}>
+        <div className="main">
+          <Router>
             <Routes>
-              <Route path="/" element={<Landing/>} />
-              <Route path="/signup" element={<SignupPage/>} />
-              <Route path="/login" element={<LoginPage/>} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
             </Routes>
-      </Router>
-    </div>
+          </Router>
+        </div>
+      </IntlProvider>
+    </ErrorProvider>
   )
 }
 export default App

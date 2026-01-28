@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/SignUp.css';
+import { FormattedMessage } from 'react-intl';
 
 function Landing() {
   
@@ -25,13 +26,9 @@ function Landing() {
 
   return (
     <div className="register-container">
-      <h1 className='headline'>Landing Page</h1>
+      <h1 className='headline'><FormattedMessage id="forum.main.title"/></h1>
 
-      <button type="button" onClick={useLogout} className="submit-btn">Logout</button>
-
-      <div className="hint">
-        Noch keinen Account? <a href="/signup">Registrieren</a>
-      </div>
+      <button type="button" onClick={useLogout} className="submit-btn"><FormattedMessage id="forum.form.logout"/></button>
     </div>
   );
 }
