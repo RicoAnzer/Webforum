@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useError } from '../global-variables/ErrorManager.jsx';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import { NameInput, PasswordInput } from "../components/forms.jsx";
 import '../Styles/SignUp.css';
 
 //Function to display global variable errorMessage => if errorMessage is null, make errorDisplay invisible
@@ -12,22 +13,12 @@ function ErrorDisplay() {
 
 function Login() {
   const { setErrorMessage } = useError();
-  const intl = useIntl();
 
   //useNavigate() allows navigation to other pages
   const navigate = useNavigate();
   const header = {
     'Content-Type': 'application/json'
   }
-
-  //Internationalization of placeholders
-  const namePlaceholder = intl.formatMessage({
-    id: 'forum.form.username.placeholder',
-  });
-  const passwordPlaceholder = intl.formatMessage({
-    id: 'forum.form.password.placeholder',
-  });
-
 
   async function useLogin(formData) {
 
@@ -57,20 +48,10 @@ function Login() {
     <div className="register-container">
       <h1 className='headline'><FormattedMessage id="forum.form.login" /></h1>
       <form className="register-form" action={useLogin}>
-        <div className="form-group">
-          <label className='secondary-text' name="name"><FormattedMessage id="forum.form.username" /></label>
-          <input type="text"
-            name="name"
-            placeholder={namePlaceholder} />
-        </div>
 
-        <div className="form-group">
-          <label className='secondary-text' name="password"><FormattedMessage id="forum.form.password" /></label>
-          <input type="password"
-            name="password"
-            placeholder={passwordPlaceholder}
-          />
-        </div>
+        <NameInput />
+        <PasswordInput />
+
         <ErrorDisplay />
         <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
       </form>

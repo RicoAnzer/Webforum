@@ -1,7 +1,6 @@
 package com.web.forum.Repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.RoleDAO;
@@ -16,7 +15,7 @@ public class RoleRepository implements IRoleRepository {
 
     //Create and save new Role
     @Override
-    public ResponseEntity<String> save(String roleName) {
+    public String save(String roleName) {
         return roleDAO.create(roleName);
     }
 
@@ -28,7 +27,7 @@ public class RoleRepository implements IRoleRepository {
 
     //Delete existing Role
     @Override
-    public ResponseEntity<String> remove(String roleName) {
+    public String remove(String roleName) {
         return roleDAO.delete(roleName);
     }
 }

@@ -5,9 +5,9 @@ import { ErrorProvider } from './global-variables/ErrorManager.jsx'
 import './App.css'
 
 //Import routing pahes
-import LoginPage from './components/Login.jsx';
-import SignupPage from './components/SignUp.jsx';
-import Landing from "./components/Landing Page.jsx";
+import LoginPage from './pages/Login.jsx';
+import SignupPage from './pages/SignUp.jsx';
+import Landing from "./pages/Landing Page.jsx";
 
 //Import locale files containing translations
 import messages_en from './locales/en.json';

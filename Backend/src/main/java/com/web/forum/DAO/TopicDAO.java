@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.Interfaces.ITopicDAO;
@@ -31,26 +29,21 @@ public class TopicDAO implements ITopicDAO {
 
     //Save a new Topic to database
     @Override
-    public ResponseEntity<String> create(String name) {
+    public String create(String name) {
         //SQL Statement to add new Topics to database
         String createSQL = "INSERT INTO topics (name)"
                 + "VALUES (?);";
 
-        if (readbyName(name) == null) {
-            //Execute statement
-            try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
-                //At creation of Topic 
-                //=> id is automatically created inside database, doesn't need to be set here
-                statement.setString(1, name);
-                statement.executeUpdate();
-            } catch (SQLException e) {
-                log.error(e.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create topic");
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body("Topic '" + name + "' created");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+        //Execute statement
+        try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
+            //At creation of Topic 
+            //=> id is automatically created inside database, doesn't need to be set here
+            statement.setString(1, name);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
         }
+        return "Topic '" + name + "' created";
     }
 
     //Search and return Topics based on ID
@@ -136,7 +129,7 @@ public class TopicDAO implements ITopicDAO {
 
     //Delete existing Topic based on name
     @Override
-    public ResponseEntity<String> delete(String name) {
+    public String delete(String name) {
         //SQL Statement to delete Topic
         String deleteSQL = "DELETE FROM topics WHERE name = ?;";
         //execute statement
@@ -145,8 +138,7 @@ public class TopicDAO implements ITopicDAO {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Topic not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Topic deleted");
+        return "Topic deleted";
     }
 }

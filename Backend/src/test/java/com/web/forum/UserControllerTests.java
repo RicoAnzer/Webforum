@@ -31,7 +31,8 @@ import com.web.forum.DAO.TopicDAO;
 import com.web.forum.Entity.User;
 import com.web.forum.Repository.UserRepository;
 
-//Unit tests for UserController
+//Integration tests for UserController
+//APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

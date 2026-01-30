@@ -26,6 +26,8 @@ import com.web.forum.DAO.TopicDAO;
 import com.web.forum.Entity.Topic;
 import com.web.forum.Repository.TopicRepository;
 
+//Integration tests for TopicController
+//APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

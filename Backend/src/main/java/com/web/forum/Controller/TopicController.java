@@ -25,7 +25,11 @@ public class TopicController {
     //Add a new Topic
     @PostMapping("/add/{name}")
     public ResponseEntity<?> addTopic(@PathVariable String name) {
-        return topicRepository.save(name);
+        if (topicRepository.findByName(name) == null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(topicRepository.save(name));
+        }else{
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+        }
     }
 
     //Return all Topics
@@ -55,7 +59,6 @@ public class TopicController {
     //Deletes Topic by name
     @DeleteMapping("/delete/{topicName}")
     public ResponseEntity<?> deleteTopic(@PathVariable String topicName) {
-        //Deletes Topic by topicName parameter
-        return topicRepository.remove(topicName);
+        return ResponseEntity.status(HttpStatus.OK).body(topicRepository.remove(topicName));
     }
 }

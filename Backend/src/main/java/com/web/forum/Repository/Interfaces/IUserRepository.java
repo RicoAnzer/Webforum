@@ -1,7 +1,5 @@
 package com.web.forum.Repository.Interfaces;
 
-import org.springframework.http.ResponseEntity;
-
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.User;
 
@@ -9,7 +7,7 @@ import com.web.forum.Entity.User;
 public interface IUserRepository {
 
     //Create and save new User
-    public ResponseEntity<String> save(User user, String password);
+    public LoginCredentials save(User user, String password);
 
     //Find specific User based on username
     public LoginCredentials findCredByName(String username);
@@ -18,8 +16,8 @@ public interface IUserRepository {
     public User findByName(String username);
 
     //Update existing User
-    public ResponseEntity<?> change(User user);
+    public User change(User user);
 
     //Delete existing User
-    public ResponseEntity<String> remove(String username);
+    public String remove(String username);
 }

@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------------------------------------------------   
 #eclipse-temurin -> Image to run java applications
 #17-jdk-alpine -> Image containing jdk 17
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /Backend
 #Copy ssl self-signed certificate 
 COPY keystore.p12 /Backend

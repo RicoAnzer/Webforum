@@ -2,14 +2,12 @@ package com.web.forum.DAO.Interfaces;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
-
 import com.web.forum.Entity.Topic;
 
 public interface ITopicDAO {
 
     //Create and save new Topic
-    public ResponseEntity<String> create(String name);
+    public String create(String name);
 
     //Find and return all Topics in database
     public List<Topic> readAll();
@@ -21,5 +19,5 @@ public interface ITopicDAO {
     public Topic readbyName(String name);
 
     //Delete existing Topic
-    public ResponseEntity<String> delete(String name);
+    public String delete(String name);
 }

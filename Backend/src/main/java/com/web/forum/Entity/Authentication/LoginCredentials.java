@@ -3,9 +3,9 @@ package com.web.forum.Entity.Authentication;
 //Entity class for LoginCredentials => Login information used in backend for authentication
 public class LoginCredentials {
 
-    private final Long userId;
+    private Long userId;
     private final String username;
-    private final String password;
+    private String password;
 
     //Constructor
     public LoginCredentials(Long userId, String username, String password) {
@@ -25,5 +25,13 @@ public class LoginCredentials {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setId(Long Id) {
+        this.userId = Id;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

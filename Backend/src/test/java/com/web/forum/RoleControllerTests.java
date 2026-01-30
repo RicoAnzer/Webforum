@@ -21,7 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.web.forum.DAO.TopicDAO;
 
-
+//Integration tests for RoleController
+//APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

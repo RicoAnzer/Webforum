@@ -81,7 +81,6 @@ public class UserService implements UserDetailsService {
         String username = request.getUsername();
         String password = request.getPassword();
         String confirmedPassword = request.getConfirmedPassword();
-
         //Compare password and confirmPassword values
         if (password.equals(confirmedPassword)) {
             //If username is empty => error
@@ -118,24 +117,22 @@ public class UserService implements UserDetailsService {
                         false
                 );
 
-                //Save newUser to database
-                userRepository.save(newUser, encodedPassword);
-                //Get newly created User, now with auto generated id
-                com.web.forum.Entity.User createdUser = userRepository.findByName(username);
-
+                //Save newUser to database and autogenerate ID
+                LoginCredentials credentials = userRepository.save(newUser, encodedPassword);
                 //Bind Role 'USER' to created user in table user_roles
                 try {
                     //Extract Role "USER"
                     //=> 1 = USER
-                    Role role = roleRepository.find(1);
-
-                    //Bind Role "USER" to user
-                    userRoleRepository.save(createdUser.getId(), role.getId());
+                    if (credentials != null) {
+                        Role role = roleRepository.find(1);
+                        //Bind Role "USER" to user
+                        userRoleRepository.save(credentials.getUserId(), role.getId());
+                    }
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't bind User to Role");
                 }
 
-                return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+                return ResponseEntity.status(HttpStatus.CREATED).body(credentials);
 
             } else {
                 //If name already in database => error

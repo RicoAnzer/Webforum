@@ -3,7 +3,6 @@ package com.web.forum.Repository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.TopicDAO;
@@ -18,7 +17,7 @@ public class TopicRepository implements ITopicRepository {
 
     //Save a new Topic to database
     @Override
-    public ResponseEntity<String> save(String name) {
+    public String save(String name) {
         return topicDAO.create(name);
     }
 
@@ -28,15 +27,21 @@ public class TopicRepository implements ITopicRepository {
         return topicDAO.readAll();
     }
 
-    //Delete existing Topic in database
-    @Override
-    public ResponseEntity<String> remove(String name) {
-        return topicDAO.delete(name);
-    }
-    
     //Find specific Topic by ID
     @Override
     public Topic findByID(Long ID) {
         return topicDAO.readbyID(ID);
     } 
+
+    //Find specific Topic by ID
+    @Override
+    public Topic findByName(String name) {
+        return topicDAO.readbyName(name);
+    } 
+
+    //Delete existing Topic in database
+    @Override
+    public String remove(String name) {
+        return topicDAO.delete(name);
+    }
 }

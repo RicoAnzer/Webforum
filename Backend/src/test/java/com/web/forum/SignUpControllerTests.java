@@ -31,7 +31,8 @@ import com.web.forum.Repository.UserRepository;
 
 import jakarta.servlet.http.Cookie;
 
-//Unit tests for SignUpController
+//Integration tests for SignUpController
+//APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -88,7 +89,7 @@ public class SignUpControllerTests {
             mockMvc.perform(requestB)
                     .andExpect(status().isCreated())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(regRequest.getUsername()));
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(regRequest.getUsername()));
 
         } catch (Exception ex) {
             log.error(ex.toString());

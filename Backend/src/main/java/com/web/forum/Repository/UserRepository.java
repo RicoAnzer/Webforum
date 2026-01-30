@@ -1,7 +1,6 @@
 package com.web.forum.Repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.UserDAO;
@@ -17,7 +16,7 @@ public class UserRepository implements IUserRepository {
 
     //Save a new User to database
     @Override
-    public ResponseEntity<String> save(User user, String password) {
+    public LoginCredentials save(User user, String password) {
         return userDAO.create(user, password);
     }
 
@@ -35,13 +34,13 @@ public class UserRepository implements IUserRepository {
 
     //Update existing User
     @Override
-    public ResponseEntity<?> change(User user) {
+    public User change(User user) {
         return userDAO.update(user);
     }
 
     //Delete existing User in database
     @Override
-    public ResponseEntity<String> remove(String username) {
+    public String remove(String username) {
         return userDAO.delete(username);
     }
 }

@@ -44,7 +44,7 @@ public class UserController {
         if (user != null) {
             //Check if new name already belongs to another user
             if (userRepository.findByName(newUser.getName()) == null) {
-                return userRepository.change(newUser);
+                return ResponseEntity.status(HttpStatus.OK).body(userRepository.change(newUser));
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("An User with this name already exists");
             }
@@ -56,6 +56,6 @@ public class UserController {
     //Delete an User by username
     @DeleteMapping("/delete/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
-        return userRepository.remove(username);
+        return ResponseEntity.status(HttpStatus.OK).body(userRepository.remove(username));
     }
 }
