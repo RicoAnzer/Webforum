@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.User;
-import com.web.forum.Repository.UserRepository;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userDAO;
 
     //Return an User by username
     @GetMapping("/get/{username}")
     public ResponseEntity<?> getUser(@PathVariable String username) {
         //Get User by ID parameter
-        User user = userRepository.findByName(username);
+        User user = userDAO.readName(username);
         //If user = null => user doesn't exist
         if (user != null) {
             //Return User
@@ -39,12 +39,12 @@ public class UserController {
     //Update user
     @PutMapping("/update/{oldUserName}")
     public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody User newUser) {
-        User user = userRepository.findByName(oldUserName);
+        User user = userDAO.readName(oldUserName);
         //Check if user exists
         if (user != null) {
             //Check if new name already belongs to another user
-            if (userRepository.findByName(newUser.getName()) == null) {
-                return ResponseEntity.status(HttpStatus.OK).body(userRepository.change(newUser));
+            if (userDAO.readName(newUser.getName()) == null) {
+                return ResponseEntity.status(HttpStatus.OK).body(userDAO.update(newUser));
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("An User with this name already exists");
             }
@@ -56,6 +56,6 @@ public class UserController {
     //Delete an User by username
     @DeleteMapping("/delete/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userRepository.remove(username));
+        return ResponseEntity.status(HttpStatus.OK).body(userDAO.delete(username));
     }
 }

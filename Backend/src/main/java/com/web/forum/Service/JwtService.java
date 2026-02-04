@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.web.forum.Repository.UserRepository;
+import com.web.forum.DAO.UserDAO;
 import com.web.forum.Security.JwtConstant;
 
 import io.jsonwebtoken.Claims;
@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class JwtService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userDAO;
 
     //Generate SecretKey for jwt Token
     private final static SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
@@ -73,7 +73,7 @@ public class JwtService {
         // If token is not missing and not expired, return true
         return !(jwtToken == null
                 || isTokenExpired(jwtToken)
-                && userRepository.findByName(getUserName(jwtToken)) != null);
+                && userDAO.readName(getUserName(jwtToken)) != null);
     }
 
     //Extract all claims out of jwt token

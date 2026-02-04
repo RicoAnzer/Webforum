@@ -28,8 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.forum.DAO.TopicDAO;
+import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.User;
-import com.web.forum.Repository.UserRepository;
 
 //Integration tests for UserController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
@@ -43,7 +43,7 @@ class UserControllerTests {
     private MockMvc mockMvc;
 
     @Autowired
-    public UserRepository userRepository;
+    public UserDAO userDAO;
 
     String newName = "";
     User mockUser = null;
@@ -59,11 +59,11 @@ class UserControllerTests {
         String date = LocalDate.now().format(dateTimeFormatter);
         //Create mocked user
         mockUser = new User(null, "Herbert1234", roles, "", date, "", false);
-        userRepository.save(mockUser, "1234");
+        userDAO.create(mockUser, "1234");
         //New name of mockUser for testing updateUserWhenExists()
         newName = "Herbert4321";
         mockUser2 = new User(null, "Franz1234", roles, "", date, "", false);
-        userRepository.save(mockUser2, "1234");
+        userDAO.create(mockUser2, "1234");
     }
 
     @AfterAll
@@ -113,7 +113,7 @@ class UserControllerTests {
             List<String> roles = new ArrayList<>(Arrays.asList("USER"));
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             String date = LocalDate.now().format(dateTimeFormatter);
-            User oldUser = userRepository.findByName(mockUser.getName());
+            User oldUser = userDAO.readName(mockUser.getName());
             User updatedUser = new User(oldUser.getId(), newName, roles, "null", date, "", false);
 
             //UpdatedUser object as json
@@ -173,7 +173,7 @@ class UserControllerTests {
         try {
             //mockUser2 (Franz) tries to rename his account to the new name of mockUser (Herbert)
             //Get Herbert
-            User updatedUser = userRepository.findByName(newName);
+            User updatedUser = userDAO.readName(newName);
             String errorMessage = "An User with this name already exists";
 
             //UpdatedUser object as json

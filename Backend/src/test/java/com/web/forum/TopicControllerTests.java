@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.web.forum.DAO.TopicDAO;
 import com.web.forum.Entity.Topic;
-import com.web.forum.Repository.TopicRepository;
 
 //Integration tests for TopicController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
@@ -38,22 +37,22 @@ public class TopicControllerTests {
     private MockMvc mockMvc;
 
     @Autowired
-    public TopicRepository topicRepository;
+    public TopicDAO topicDAO;
 
     private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
 
     @BeforeAll
     public void setUp() {
         log.info("Start TopicControllerTests...");
-        topicRepository.save("First Topic");
-        topicRepository.save("Second Topic");
+        topicDAO.create("First Topic");
+        topicDAO.create("Second Topic");
     }
 
     @AfterAll
     public void cleanUp() {
         log.info("End TopicControllerTests...");
-        topicRepository.remove("First Topic");
-        topicRepository.remove("Second Topic");
+        topicDAO.delete("First Topic");
+        topicDAO.delete("Second Topic");
     }
 
     //Test addTopic when successful
@@ -112,7 +111,7 @@ public class TopicControllerTests {
     @Test
     public void getTopicWhenExists() throws Exception {
         log.info("Testing getTopicWhenExists()...");
-        List<Topic> topics = topicRepository.findAll();
+        List<Topic> topics = topicDAO.readAll();
 
         RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", topics.get(0).getId())
                 .contentType(MediaType.APPLICATION_JSON);

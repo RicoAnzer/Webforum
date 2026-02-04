@@ -25,9 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.forum.DAO.TopicDAO;
+import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
-import com.web.forum.Repository.UserRepository;
 
 import jakarta.servlet.http.Cookie;
 
@@ -42,7 +42,7 @@ public class SignUpControllerTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    public UserRepository userRepository;
+    public UserDAO userDAO;
 
     private String registerRequestBody;
     private String loginRequestBody;
@@ -70,7 +70,7 @@ public class SignUpControllerTests {
 
     @AfterAll
     public void cleanUp() {
-        userRepository.remove(credentials.getUsername());
+        userDAO.delete(credentials.getUsername());
         log.info("End SignUpControllerTests...");
     }
 
