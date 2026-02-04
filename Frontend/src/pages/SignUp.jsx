@@ -1,39 +1,50 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useError } from '../global-variables/ErrorManager.jsx';
+import { useError, DisplayErrorMessage } from '../global-variables/ErrorMessage.jsx';
+import { useFormData } from '../global-variables/FormData.jsx';
 import { FormattedMessage } from 'react-intl';
-import { NameInput, PasswordInput, ConfirmPasswordInput}  from "../components/forms.jsx";
+import { NameInput, PasswordInput, ConfirmPasswordInput } from "../components/forms.jsx";
 import '../Styles/SignUp.css';
 
 //Function to display global variable errorMessage => if errorMessage is null, make errorDisplay invisible
 function ErrorDisplay() {
   const { errorMessage } = useError();
-  return errorMessage !== '' ? <div className='headline' >{errorMessage}</div> : null;
+  return errorMessage !== '' ? <DisplayErrorMessage /> : null;
 }
 
 function SignUp() {
   const { setErrorMessage } = useError();
-
-
+  //Save formData in global variable if Error
+  const { setFormData, formData } = useFormData();
   //useNavigate() allows navigation to other pages
   const navigate = useNavigate();
   const header = {
     'Content-Type': 'application/json'
   }
-
-  function signUp(formData) {
-    const name = formData.get("name");
-    const userPassword = formData.get("password");
-    const confirmUserPassword = formData.get("confirmPassword");
-
+  function signUp() {
+    console.log(formData);
     const response = axios
-      .post("https://localhost:8080/auth/register", { username: name, password: userPassword, confirmedPassword: confirmUserPassword }, {
+      .post(`https://${import.meta.env.VITE_SPRING_URL}/auth/register`, { username: formData.name, password: formData.password, confirmedPassword: formData.confirmPassword }, {
         withCredentials: true,
         headers: header
       }).then(response => {
+        //Reset data if success
+        setFormData({
+          ...formData,
+          "name": "",
+          "password": "",
+          "confirmPassword": ""
+        })
+        setErrorMessage("")
         navigate('/login');
       })
       .catch(error => {
+        const errorMsg = error.response?.data;
+        if (!errorMsg) {
+          setErrorMessage(<FormattedMessage id="error.unexpected" />)
+          return;
+        }
+
         switch (error.response.data) {
           case "Username is empty":
             setErrorMessage(<FormattedMessage id="error.formRegister.userEmpty" />)
@@ -43,6 +54,9 @@ function SignUp() {
             break;
           case "Username already exists":
             setErrorMessage(<FormattedMessage id="error.formRegister.usernameExists" />)
+            break;
+          case "Please choose a password":
+            setErrorMessage(<FormattedMessage id="error.formRegister.passwordEmpty" />)
             break;
           case "Password and confirmedPassword don't match":
             setErrorMessage(<FormattedMessage id="error.formRegister.passwordNotMatching" />)
@@ -55,7 +69,7 @@ function SignUp() {
       <h1 className='headline'><FormattedMessage id="forum.form.register" /></h1>
       <form className="register-form" action={signUp}>
 
-        <NameInput />
+        <NameInput onChange={(e) => setFormDataState({...formDataState, name: e.target.value})}/>
         <PasswordInput />
         <ConfirmPasswordInput />
 

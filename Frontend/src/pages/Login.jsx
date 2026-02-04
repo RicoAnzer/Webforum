@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useError } from '../global-variables/ErrorManager.jsx';
+import { useError, DisplayErrorMessage } from '../global-variables/ErrorMessage.jsx';
+import { useFormData } from '../global-variables/FormData.jsx';
 import { FormattedMessage } from 'react-intl';
 import { NameInput, PasswordInput } from "../components/forms.jsx";
 import '../Styles/SignUp.css';
@@ -8,37 +9,51 @@ import '../Styles/SignUp.css';
 //Function to display global variable errorMessage => if errorMessage is null, make errorDisplay invisible
 function ErrorDisplay() {
   const { errorMessage } = useError();
-  return errorMessage !== '' ? <div className='headline' >{errorMessage}</div> : null;
+  return errorMessage !== '' ? <DisplayErrorMessage /> : null;
 }
 
 function Login() {
   const { setErrorMessage } = useError();
-
+  //Save formData in global variable if Error
+  const { setFormData, formData } = useFormData();
   //useNavigate() allows navigation to other pages
   const navigate = useNavigate();
   const header = {
     'Content-Type': 'application/json'
   }
 
-  async function useLogin(formData) {
-
-    const varname = formData.get('name');
-    const varpassword = formData.get('password');
+  async function useLogin() {
     return await axios
-      .post("https://localhost:8080/auth/login", { username: varname, password: varpassword }, {
+      .post(`https://${import.meta.env.VITE_SPRING_URL}/auth/login`, { username: formData.name, password: formData.password }, {
         withCredentials: true,
         headers: header
       }).then(response => {
+        //Reset data if success
+        setFormData({
+          ...formData,
+          "name": "",
+          "password": ""
+        })
+        setErrorMessage("")
         console.log(response.data);
         navigate('/');
       })
       .catch(error => {
+        const errorMsg = error.response?.data;
+        if (!errorMsg) {
+          setErrorMessage(<FormattedMessage id="error.unexpected" />)
+          return;
+        }
+
         switch (error.response.data) {
           case "User not found":
             setErrorMessage(<FormattedMessage id="error.formLogin.userNotFound" />)
             break;
           case "Password not found":
             setErrorMessage(<FormattedMessage id="error.formLogin.passwordNotFound" />)
+            break;
+          case "User is already logged in":
+            setErrorMessage(<FormattedMessage id="error.formLogin.alreadyLoggedIn" />)
             break;
         }
       });

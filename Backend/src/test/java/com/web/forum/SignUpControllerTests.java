@@ -120,6 +120,90 @@ public class SignUpControllerTests {
         }
     }
 
+    //Test unsuccessful user registration => Username is empty
+    @SuppressWarnings("null")
+    @Order(3)
+    @Test
+    public void registerUserUsernameEmpty() {
+        log.info("Testing registerUserUsernameEmpty()...");
+        try {
+            String errorMessage = "Username is empty";
+            RegistrationRequest wrongRequest = new RegistrationRequest("", "1234", "1234");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test unsuccessful user registration => Password is empty
+    @SuppressWarnings("null")
+    @Order(4)
+    @Test
+    public void registerUserUsernameTooLong() {
+        log.info("Testing registerUserUsernameTooLong()...");
+        try {
+            String errorMessage = "Please choose an username with less than 20 characters";
+            RegistrationRequest wrongRequest = new RegistrationRequest("Franz12345678901234567890", "1234", "1234");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test unsuccessful user registration => Password is empty
+    @SuppressWarnings("null")
+    @Order(5)
+    @Test
+    public void registerUserPasswordEmpty() {
+        log.info("Testing registerUserPasswordEmpty()...");
+        try {
+            String errorMessage = "Please choose a password";
+            RegistrationRequest wrongRequest = new RegistrationRequest("Franz1234", "", "");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
     //Test unsuccessful user registration => Password mismatch
     @SuppressWarnings("null")
     @Order(3)
@@ -134,12 +218,12 @@ public class SignUpControllerTests {
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(wrongRequest);
 
-            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+            RequestBuilder request = MockMvcRequestBuilders.post("/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
             //Expect Status BadRequest and check error message
-            mockMvc.perform(requestB)
+            mockMvc.perform(request)
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(errorMessage));
 
@@ -182,7 +266,7 @@ public class SignUpControllerTests {
         log.info("Testing testUserLoginAlreadyLoggedIn()...");
         try {
             String cookieName = "jwtToken";
-            String errorMessage = "User " + credentials.getUsername() + " is already logged in";
+            String errorMessage = "User is already logged in";
 
             //RequestBody of first successful login
             RequestBuilder firstRequestB = MockMvcRequestBuilders.post("/auth/login")

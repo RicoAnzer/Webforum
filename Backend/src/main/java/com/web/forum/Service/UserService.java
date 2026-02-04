@@ -81,16 +81,22 @@ public class UserService implements UserDetailsService {
         String username = request.getUsername();
         String password = request.getPassword();
         String confirmedPassword = request.getConfirmedPassword();
+
+        //If username is empty => error
+        if ("".equals(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is empty");
+        }
+        //If username is too long => error
+        if (username.length() > 20) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose an username with less than 20 characters");
+        }
         //Compare password and confirmPassword values
         if (password.equals(confirmedPassword)) {
             //If username is empty => error
-            if ("".equals(username)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is empty");
+            if ("".equals(password)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose a password");
             }
-            //If username is too long => error
-            if (username.length() > 20) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose an username with less than 20 characters");
-            }
+
             //Check if username already exists (if it doesn't exist: findByName() == null)
             if (userRepository.findByName(username) == null) {
                 //Encode password
@@ -158,7 +164,7 @@ public class UserService implements UserDetailsService {
         }
         //If user is already logged in => error
         if (jwtService.isLoggedIn(request)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User " + loginCredentials.getUsername() + " is already logged in");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already logged in");
         }
         //If password is wrong => error
         String encryptedPassword = userRepository.findCredByName(loginCredentials.getUsername()).getPassword();

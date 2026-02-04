@@ -15,7 +15,6 @@ services:
     #=> Enable devtools to enable hot reload
     #=> Overwrite jdbc url: Replace localhost by hostname of postgres container
     environment:
-      - GRADLE_USER_HOME=/Backend
       - spring.datasource.url=jdbc:postgresql://backend-postgres:${POSTGRES_PORT}/${POSTGRES_DB_NAME}
     #Mount Backend source code into container
     volumes:

@@ -1,0 +1,10 @@
+:root {
+  --primary-text-color: white;
+  --primary-color: #47095e;
+  --secondary-color: #7a10bf;
+  --tertiary-color: #312e33;
+  --button-primary-color: #0097a6;
+  --button-secondary-color: #00A9BB;
+  /**rgba to set opacity of backgroung color without affecting text*/
+  --error-background-color: rgba(106, 16, 38, 0.8);
+}

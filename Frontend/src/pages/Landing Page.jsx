@@ -13,7 +13,7 @@ function Landing() {
 
   async function useLogout() {
     return await axios
-      .post("https://localhost:8080/auth/logout", {}, {
+      .post(`https://${import.meta.env.VITE_SPRING_URL}/auth/logout`, {}, {
         withCredentials: true,
         headers: header
       }).then(response => {
