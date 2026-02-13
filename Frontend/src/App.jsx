@@ -1,49 +1,61 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { useState } from 'react';
 import { FormattedMessage, IntlProvider } from 'react-intl';
 import { ErrorProvider } from './global-variables/ErrorMessage.jsx'
-import { FormDataProvider } from './global-variables/FormData.jsx'
+import { TopicProvider } from './global-variables/Topics.jsx'
+import { ThreadList } from './pages/ThreadList.jsx';
+import Compose from './components/compose.jsx';
+import {
+  NameInputProvider,
+  PasswordInputProvider,
+  ConfirmPasswordInputProvider,
+  AddTopicInputProvider,
+  LoginVisibilityProvider,
+  SignUpVisiblityProvider,
+  AddTopicVisiblityProvider
+} from './global-variables/FormData.jsx'
+import { Header } from './components/topics.jsx'
 import './Styles/App.css'
 
 //Import routing pages
-import LoginPage from './pages/Login.jsx';
-import SignupPage from './pages/SignUp.jsx';
-import Landing from "./pages/Landing Page.jsx";
+import Forum from "./pages/Forum.jsx";
 
 //Import locale files containing translations
 import messages_en from './locales/en.json';
-import messages_de from './locales/de.json';
 //List locale files to iterate through to switch language
 const messages = {
   en: messages_en,
-  de: messages_de,
 };
 
 function App() {
   //Starting language
-  const [state, setState] = useState({ locale: 'en' })
-  //Switch language
-  function handleLanguageChange() {
-    (e) => { this.setState({ locale: e.target.value }) }
-  }
+  const [state] = useState({ locale: 'en' })
 
   return (
-    <FormDataProvider>
-      <ErrorProvider>
+    <ErrorProvider>
+      <Compose components={[
+        TopicProvider,
+        NameInputProvider,
+        PasswordInputProvider,
+        ConfirmPasswordInputProvider,
+        AddTopicInputProvider,
+        LoginVisibilityProvider,
+        SignUpVisiblityProvider,
+        AddTopicVisiblityProvider]}>
         <IntlProvider locale={state.locale}
           messages={messages[state.locale]}>
           <div className="main">
-            <Router>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/login" element={<LoginPage />} />
+            <BrowserRouter >
+              <Header></Header>
+              <Routes >
+                <Route path="/" element={<Forum />} />
+                <Route path="/:topicId" element={<ThreadList />} />
               </Routes>
-            </Router>
+            </BrowserRouter>
           </div>
         </IntlProvider>
-      </ErrorProvider>
-      </FormDataProvider>
+      </Compose>
+    </ErrorProvider>
   )
 }
 export default App

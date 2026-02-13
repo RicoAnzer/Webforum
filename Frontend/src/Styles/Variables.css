@@ -1,10 +1,17 @@
 :root {
   --primary-text-color: white;
+  /**Primary and secondary color used for puprle main background*/
   --primary-color: #47095e;
-  --secondary-color: #7a10bf;
-  --tertiary-color: #312e33;
+  --secondary-color: #7110b2;
+  /**Popup color used for popup-container background*/
+  --popup-color: #312e33;
+  /**secondary background color used as secondary main background -> semi tranparent over main background*/
+  --secondary-background-color: rgba(49, 46, 51, 0.9);
+  --secondary-background-hover-color: rgba(64, 60, 66, 0.9);
+  --border-color: #d1d5db;
+  /**Button primary used for submit buttons*/
   --button-primary-color: #0097a6;
-  --button-secondary-color: #00A9BB;
+  --button-primary-hover-color: #00A9BB;
   /**rgba to set opacity of backgroung color without affecting text*/
   --error-background-color: rgba(106, 16, 38, 0.8);
 }

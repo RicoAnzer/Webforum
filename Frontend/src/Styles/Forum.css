@@ -1,0 +1,17 @@
+@import url('Variables.css');
+
+.main-container {
+  display: grid;
+  flex-grow: 1;
+}
+
+.forum{
+  min-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 2rem;
+  /**All pages (sign up, login, main, forum) in same cell to overlap => Only one visible at any time*/
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+}
