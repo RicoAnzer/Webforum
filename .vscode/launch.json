@@ -2,11 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "java",
-            "name": "ForumApplication",
+            "name": "Launch Firefox",
+            "type": "firefox",
             "request": "launch",
-            "mainClass": "com.web.forum.ForumApplication",
-            "projectName": "Backend"
-        }
+            "url": "https://localhost:5173",
+            "webRoot": "${workspaceFolder}/client"
+        },
     ]
 }

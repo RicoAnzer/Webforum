@@ -9,15 +9,15 @@ import {
   useSignUpVisible,
   useLoginVisible,
   useAddTopicVisible
-} from '../global-variables/FormData.jsx';
+} from '../global-variables/PopupData.jsx';
 import {
   NameInput,
   PasswordInput,
   ConfirmPasswordInput,
   AddTopicInput
-} from "../components/forms.jsx";
+} from "../components/popup.jsx";
 
-import '../Styles/SignUp.css';
+import '../Styles/Popup.css';
 import '../Styles/Forum.css';
 
 //Function to display global variable errorMessage => if errorMessage is null, make errorDisplay invisible

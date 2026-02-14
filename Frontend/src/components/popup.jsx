@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNameInput, usePasswordInput, useConfirmPasswordInput, useAddTopicInput } from '../global-variables/FormData.jsx';
+import { useNameInput, usePasswordInput, useConfirmPasswordInput, useAddTopicInput } from '../global-variables/PopupData.jsx';
 
 //Internationalization of placeholders
 function namePlaceholder() {

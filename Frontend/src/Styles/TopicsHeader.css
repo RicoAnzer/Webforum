@@ -11,6 +11,11 @@ header {
   display: flex;
 }
 
+.secondary-text {
+  color: var(--primary-text-color);
+  font-weight: 600;
+}
+
 .topics-container{
   width: 80px;
   align-content: center;

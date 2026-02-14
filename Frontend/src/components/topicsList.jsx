@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { useTopics } from '../global-variables/Topics';
-import { useAddTopicVisible, useLoginVisible, useSignUpVisible } from "../global-variables/FormData";
+import { useAddTopicVisible, useLoginVisible, useSignUpVisible } from "../global-variables/PopupData";
 
 import '../Styles/TopicsHeader.css';
 
@@ -14,15 +14,15 @@ const header = {
 //Read topicsList and for each topics display topics-container
 //Use react-router-dom Link to dynamically create pages
 const DisplayTopics = ({ topicsList }) => {
-    const { setAddTopicVisible } = useAddTopicVisible()
+    const { setAddTopicVisible, addTopicVisible } = useAddTopicVisible()
     return topicsList?.length > 0 ? (
         <div className="topics-list">
             {topicsList.map((topic) => (
                 <Link to={`/${topic.id}`} key={topic.id} className='topics-container'>
-                    <p>{topic.name}</p>
+                    <p className='secondary-text'>{topic.name}</p>
                 </Link>
             ))}
-            <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
+            <div className='topics-container add-topic' onClick={ () =>setAddTopicVisible(prev => !prev) }>
                 <p><FormattedMessage id="forum.form.addTopic" /></p>
             </div>
         </div>
@@ -43,7 +43,7 @@ export const Header = () => {
                 setTopics(response?.data);
             })
             .catch(error => {
-                console.log(error);
+                console.log(error?.response?.data);
             });
     }
 
