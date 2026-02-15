@@ -7,7 +7,7 @@ header {
   border-radius: 8px;
 }
 
-.topics-list{
+.topics-list {
   display: flex;
 }
 
@@ -16,7 +16,7 @@ header {
   font-weight: 600;
 }
 
-.topics-container{
+.topics-container {
   width: 80px;
   align-content: center;
   border-right: 1px solid var(--border-color);
@@ -32,20 +32,22 @@ header {
   padding: 10px;
 }
 
-.topics-container:hover{
+.topics-container:hover {
   background: var(--secondary-background-hover-color);
 }
 
-.profile-container{
-  display: flex;
+.profile-container {
   padding: 10px;
   border-left: 1px solid var(--border-color);
   margin-left: auto;
-  align-items: center;
-  gap: 10px;
 }
 
-.profile-container .submit-btn{
+.profile-container .login-buttons {
+  display: flex;
+   gap: 10px;
+}
+
+.profile-container .submit-btn {
   width: 100px;
   font-size: 12px;
   font-weight: bold;

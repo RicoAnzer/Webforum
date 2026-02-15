@@ -29,21 +29,32 @@ public class TopicDAO implements ITopicDAO {
 
     //Save a new Topic to database
     @Override
-    public String create(String name) {
+    public Topic create(String name) {
         //SQL Statement to add new Topics to database
         String createSQL = "INSERT INTO topics (name)"
-                + "VALUES (?);";
-
+                + "VALUES (?)"
+                + "RETURNING id, name;";
+        Topic generatedTopic = null;
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
             //At creation of Topic 
             //=> id is automatically created inside database, doesn't need to be set here
             statement.setString(1, name);
-            statement.executeUpdate();
+            statement.execute();
+
+            //Return newly generated Topic
+            ResultSet result = statement.getResultSet();
+            log.info(result.toString());
+            while (result.next()) {
+                generatedTopic =  new Topic(
+                    result.getLong("id"),
+                    result.getString("name")
+                );
+            }
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return "Topic '" + name + "' created";
+        return generatedTopic;
     }
 
     //Search and return Topics based on ID

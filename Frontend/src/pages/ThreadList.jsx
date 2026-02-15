@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 export const ThreadList = () => {
     const { topicId } = useParams();
     return (
-        <div className="topic-detail">
+        <div className="thread-list">
             <h1>Test Topic ID: {topicId}</h1>
-            {}
+            { }
         </div>
     );
 };

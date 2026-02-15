@@ -7,7 +7,7 @@ import com.web.forum.Entity.Topic;
 public interface ITopicDAO {
 
     //Create and save new Topic
-    public String create(String name);
+    public Topic create(String name);
 
     //Find and return all Topics in database
     public List<Topic> readAll();

@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { useTopics } from '../global-variables/Topics';
+import { useUser } from '../global-variables/SignedInUser.jsx'
 import { useAddTopicVisible, useLoginVisible, useSignUpVisible } from "../global-variables/PopupData";
 
 import '../Styles/TopicsHeader.css';
@@ -14,7 +15,7 @@ const header = {
 //Read topicsList and for each topics display topics-container
 //Use react-router-dom Link to dynamically create pages
 const DisplayTopics = ({ topicsList }) => {
-    const { setAddTopicVisible, addTopicVisible } = useAddTopicVisible()
+    const { setAddTopicVisible } = useAddTopicVisible()
     return topicsList?.length > 0 ? (
         <div className="topics-list">
             {topicsList.map((topic) => (
@@ -22,7 +23,7 @@ const DisplayTopics = ({ topicsList }) => {
                     <p className='secondary-text'>{topic.name}</p>
                 </Link>
             ))}
-            <div className='topics-container add-topic' onClick={ () =>setAddTopicVisible(prev => !prev) }>
+            <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
                 <p><FormattedMessage id="forum.form.addTopic" /></p>
             </div>
         </div>
@@ -31,6 +32,7 @@ const DisplayTopics = ({ topicsList }) => {
 
 export const Header = () => {
     const { topics, setTopics } = useTopics()
+    const { user, setUser } = useUser()
     const { setSignUpVisible } = useSignUpVisible()
     const { setLoginVisible } = useLoginVisible()
 
@@ -47,6 +49,21 @@ export const Header = () => {
             });
     }
 
+    async function logout() {
+        try {
+            const response = await axios
+                .post(`https://${import.meta.env.VITE_SPRING_URL}/auth/logout`, {}, {
+                    withCredentials: true,
+                    headers: header
+                })
+            //Delete logged in user information
+            setUser(null)
+        }
+        catch (error) {
+            console.log(error.response?.data);
+        }
+    }
+
     //Load Topics at start
     useEffect(() => {
         getTopics()
@@ -56,8 +73,19 @@ export const Header = () => {
         <header>
             <DisplayTopics topicsList={topics}></DisplayTopics>
             <div className='profile-container'>
-                <button type="button" onClick={() => setLoginVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
-                <button type="button" onClick={() => setSignUpVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+                {/**Display if logged in*/}
+                {user != null &&
+                    <div className='profile'>
+                        <button type="button" onClick={logout} className="submit-btn"><FormattedMessage id="forum.form.logout" /></button>
+                    </div>}
+
+                {/**Display if logged out*/}
+                {user == null &&
+                    <div className='login-buttons'>
+                        <button type="button" onClick={() => setLoginVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+                        <button type="button" onClick={() => setSignUpVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+                    </div>
+                }
             </div>
         </header>
     )
