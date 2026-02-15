@@ -1,12 +1,11 @@
 HELP.md
-.gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 *.env
 *keystore.p12
-
+### Maven ###
+/Backend/target
 ### STS ###
 /Backend/.apt_generated
 /Backend/.classpath

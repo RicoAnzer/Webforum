@@ -25,13 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.forum.DAO.TopicDAO;
+import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
-import com.web.forum.Repository.UserRepository;
 
 import jakarta.servlet.http.Cookie;
 
-//Unit tests for SignUpController
+//Integration tests for SignUpController
+//APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,7 +42,7 @@ public class SignUpControllerTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    public UserRepository userRepository;
+    public UserDAO userDAO;
 
     private String registerRequestBody;
     private String loginRequestBody;
@@ -51,7 +52,7 @@ public class SignUpControllerTests {
     private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
 
     @BeforeAll
-    public void setUp(){
+    public void setUp() {
         log.info("Start SignUpControllerTests...");
         this.regRequest = new RegistrationRequest("Alice1234", "1234", "1234");
         this.credentials = new LoginCredentials(1L, "Alice1234", "1234");
@@ -68,8 +69,8 @@ public class SignUpControllerTests {
     }
 
     @AfterAll
-    public void cleanUp(){
-        userRepository.remove(credentials.getUsername());
+    public void cleanUp() {
+        userDAO.delete(credentials.getUsername());
         log.info("End SignUpControllerTests...");
     }
 
@@ -88,7 +89,7 @@ public class SignUpControllerTests {
             mockMvc.perform(requestB)
                     .andExpect(status().isCreated())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(regRequest.getUsername()));
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(regRequest.getUsername()));
 
         } catch (Exception ex) {
             log.error(ex.toString());
@@ -119,6 +120,90 @@ public class SignUpControllerTests {
         }
     }
 
+    //Test unsuccessful user registration => Username is empty
+    @SuppressWarnings("null")
+    @Order(3)
+    @Test
+    public void registerUserUsernameEmpty() {
+        log.info("Testing registerUserUsernameEmpty()...");
+        try {
+            String errorMessage = "Username is empty";
+            RegistrationRequest wrongRequest = new RegistrationRequest("", "1234", "1234");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test unsuccessful user registration => Password is empty
+    @SuppressWarnings("null")
+    @Order(4)
+    @Test
+    public void registerUserUsernameTooLong() {
+        log.info("Testing registerUserUsernameTooLong()...");
+        try {
+            String errorMessage = "Please choose an username with less than 20 characters";
+            RegistrationRequest wrongRequest = new RegistrationRequest("Franz12345678901234567890", "1234", "1234");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test unsuccessful user registration => Password is empty
+    @SuppressWarnings("null")
+    @Order(5)
+    @Test
+    public void registerUserPasswordEmpty() {
+        log.info("Testing registerUserPasswordEmpty()...");
+        try {
+            String errorMessage = "Please choose a password";
+            RegistrationRequest wrongRequest = new RegistrationRequest("Franz1234", "", "");
+
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongRequest);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
     //Test unsuccessful user registration => Password mismatch
     @SuppressWarnings("null")
     @Order(3)
@@ -133,12 +218,12 @@ public class SignUpControllerTests {
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(wrongRequest);
 
-            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/register")
+            RequestBuilder request = MockMvcRequestBuilders.post("/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
             //Expect Status BadRequest and check error message
-            mockMvc.perform(requestB)
+            mockMvc.perform(request)
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(errorMessage));
 
@@ -181,7 +266,7 @@ public class SignUpControllerTests {
         log.info("Testing testUserLoginAlreadyLoggedIn()...");
         try {
             String cookieName = "jwtToken";
-            String errorMessage = "User " + credentials.getUsername() + " is already logged in";
+            String errorMessage = "User is already logged in";
 
             //RequestBody of first successful login
             RequestBuilder firstRequestB = MockMvcRequestBuilders.post("/auth/login")
@@ -212,9 +297,65 @@ public class SignUpControllerTests {
         }
     }
 
-    //Test successful user logout
+    //Test unsuccessful user login => Log in using wrong username
     @SuppressWarnings("null")
     @Order(6)
+    @Test
+    public void testUserLoginWrongName() {
+        String errorMessage = "User not found";
+        log.info("Testing testUserLoginWrongName()...");
+        try {
+            LoginCredentials wrongCredentials = new LoginCredentials(1L, "Dieter4321", "1234");
+            
+            //False RegistrationRequest object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(wrongCredentials);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test unsuccessful user login => Wrong password used
+    @SuppressWarnings("null")
+    @Order(7)
+    @Test
+    public void testUserLoginWrongPassword() {
+        log.info("Testing testUserLoginWrongPassword()...");
+        try {
+            String errorMessage = "Password not found";
+            LoginCredentials wrongCredentials = new LoginCredentials(1L, "Alice1234", "4321");
+
+            //wrongCredentials object as json
+            ObjectMapper objectMapper = new ObjectMapper();
+            String wrongloginRequestBody = objectMapper.writeValueAsString(wrongCredentials);
+
+            RequestBuilder requestB = MockMvcRequestBuilders.post("/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(wrongloginRequestBody);
+
+            //Expect Status BadRequest and check error message
+            mockMvc.perform(requestB)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(errorMessage));
+                    
+        } catch (Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    //Test successful user logout
+    @SuppressWarnings("null")
+    @Order(8)
     @Test
     public void testUserLogoutSuccess() {
         log.info("Testing testUserLogoutSuccess()...");
@@ -240,7 +381,7 @@ public class SignUpControllerTests {
                     .cookie(jwtToken)
                     .content(loginRequestBody);
 
-            //Expect Status Ok and check error message
+            //Expect Status Ok and check logOut message
             mockMvc.perform(secondRequestB)
                     .andExpect(status().isOk())
                     .andExpect(content().string(logOutMessage));
@@ -252,12 +393,12 @@ public class SignUpControllerTests {
 
     //Test failed user logout => User is logging out, when not logged in
     @SuppressWarnings("null")
-    @Order(7)
+    @Order(9)
     @Test
     public void testUserLogoutNotLoggedIn() {
         log.info("Testing testUserLogoutNotLoggedIn()...");
         try {
-            
+
             //RequestBody of logout => User is not logged in -> no Cookie added
             RequestBuilder secondRequestB = MockMvcRequestBuilders.post("/auth/logout")
                     .contentType(MediaType.APPLICATION_JSON)

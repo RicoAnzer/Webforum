@@ -1,0 +1,101 @@
+/**CSS Style for Login and SignUp pages*/
+@import url('Variables.css');
+
+.headline {
+  color: var(--primary-text-color);
+}
+
+.secondary-text {
+  color: var(--primary-text-color);
+  font-weight: 600;
+}
+
+.register-container.popup {
+  width: 25%;
+  height: fit-content;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  background: var(--popup-color);
+  border-radius: 8px;
+  /**All register container (sign up, login, forum) in same cell to overlap => Only one visible at any time*/
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 5;
+  /**Stick all popups in center of screen*/
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.register-container h1 {
+  text-align: center;
+  color: var(--secondary-text-color);
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.register-form .form-group {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.register-form label {
+  display: block;
+  color: var(--secondary-text-color);
+  margin-bottom: 1rem;
+}
+
+.register-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--button-primary-color);
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: var(--button-primary-hover-color);
+  border: 1px solid var(--border-color);
+  transition: border-color 0.25s;
+}
+
+.hint {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--primary-text-color);
+}
+
+.hint a {
+  color: var(--button-primary-color);
+  text-decoration: none;
+}
+
+.hint a:hover {
+  color: var(--button-primary-hover-color);
+  text-decoration: underline;
+}
+
+.form-error{
+  background: var(--error-background-color);
+  border-radius: 6px;
+}
+
+.form-error .error-message{
+  color: var(--primary-text-color);
+  font-weight: 600;
+  padding: 0.25rem;
+  display: inline-flex;
+}

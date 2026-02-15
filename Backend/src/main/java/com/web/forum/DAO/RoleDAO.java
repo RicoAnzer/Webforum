@@ -7,8 +7,6 @@ import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.Interfaces.IRoleDAO;
@@ -29,7 +27,7 @@ public class RoleDAO implements IRoleDAO {
 
     //Create and save new Role
     @Override
-    public ResponseEntity<String> create(String roleName) {
+    public String create(String roleName) {
         //SQL Statement to add new roles to database
         String createSQL = "INSERT INTO roles (name)"
                 + "VALUES (?);";
@@ -41,9 +39,8 @@ public class RoleDAO implements IRoleDAO {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't create role");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Role '" + roleName + "' created");
+        return "Role '" + roleName + "' created";
     }
 
     //Find specific Role based on ID
@@ -74,7 +71,7 @@ public class RoleDAO implements IRoleDAO {
 
     //Delete existing Role
     @Override
-    public ResponseEntity<String> delete(String roleName) {
+    public String delete(String roleName) {
         //SQL Statement to delete Role
         String deleteSQL = "DELETE FROM roles WHERE name = ?;";
         //execute statement
@@ -83,8 +80,7 @@ public class RoleDAO implements IRoleDAO {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Role deleted");
+        return "Role deleted";
     }
 }

@@ -21,12 +21,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.web.forum.DAO.RoleDAO;
+import com.web.forum.DAO.UserDAO;
+import com.web.forum.DAO.UserRoleDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
 import com.web.forum.Entity.Role;
-import com.web.forum.Repository.RoleRepository;
-import com.web.forum.Repository.UserRepository;
-import com.web.forum.Repository.UserRoleRepository;
 import com.web.forum.Security.JwtAuthFilter;
 
 import jakarta.servlet.http.Cookie;
@@ -38,11 +38,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userDAO;
     @Autowired
-    private UserRoleRepository userRoleRepository;
+    private UserRoleDAO userRoleDAO;
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleDAO roleDAO;
     @Autowired
     private JwtService jwtService;
 
@@ -58,13 +58,13 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //Find User by username
-        LoginCredentials credentials = userRepository.findCredByName(username);
+        LoginCredentials credentials = userDAO.readLoginCredentials(username);
         //LoginCredentials == null => No User with this username, throw error
         if (credentials == null) {
             throw new UsernameNotFoundException("User not found with this name: " + username);
         }
         //List all roles
-        List<String> roles = userRoleRepository.findById(credentials.getUserId());
+        List<String> roles = userRoleDAO.readById(credentials.getUserId());
 
         //Create userdetails
         UserDetails user = User
@@ -82,10 +82,23 @@ public class UserService implements UserDetailsService {
         String password = request.getPassword();
         String confirmedPassword = request.getConfirmedPassword();
 
+        //If username is empty => error
+        if ("".equals(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is empty");
+        }
+        //If username is too long => error
+        if (username.length() > 20) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose an username with less than 20 characters");
+        }
         //Compare password and confirmPassword values
         if (password.equals(confirmedPassword)) {
-            //If matching => Check if username already exists (if it doesn't exist: findByName() == null)
-            if (userRepository.findByName(username) == null) {
+            //If username is empty => error
+            if ("".equals(password)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose a password");
+            }
+
+            //Check if username already exists (if it doesn't exist: findByName() == null)
+            if (userDAO.readName(username) == null) {
                 //Encode password
                 String encodedPassword = passwordEncoder().encode(password);
                 //Format createdAt to "dd-MM-YYYY"
@@ -110,24 +123,22 @@ public class UserService implements UserDetailsService {
                         false
                 );
 
-                //Save newUser to database
-                userRepository.save(newUser, encodedPassword);
-                //Get newly created User, now with auto generated id
-                com.web.forum.Entity.User createdUser = userRepository.findByName(username);
-
+                //Save newUser to database and autogenerate ID
+                LoginCredentials credentials = userDAO.create(newUser, encodedPassword);
                 //Bind Role 'USER' to created user in table user_roles
                 try {
                     //Extract Role "USER"
                     //=> 1 = USER
-                    Role role = roleRepository.find(1);
-
-                    //Bind Role "USER" to user
-                    userRoleRepository.save(createdUser.getId(), role.getId());
+                    if (credentials != null) {
+                        Role role = roleDAO.read(1);
+                        //Bind Role "USER" to user
+                        userRoleDAO.create(credentials.getUserId(), role.getId());
+                    }
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't bind User to Role");
                 }
 
-                return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+                return ResponseEntity.status(HttpStatus.CREATED).body(credentials);
 
             } else {
                 //If name already in database => error
@@ -142,16 +153,25 @@ public class UserService implements UserDetailsService {
 
     //Login as user
     public ResponseEntity<?> userLogin(@RequestBody LoginCredentials loginCredentials, HttpServletRequest request, HttpServletResponse response) {
-        //Expiry interval for cookie = 1 Day
-        int expiryInterval = 24 * 60 * 60;
+        //Expiry interval for cookie = 1 Day in Milliseconds
+        int expiryInterval = 24 * 60 * 60 * 1000;
+        //Load user Object from database
+        com.web.forum.Entity.User loggedInUser = userDAO.readName(loginCredentials.getUsername());
 
+        //If user doesn't exist in database => error
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        }
         //If user is already logged in => error
         if (jwtService.isLoggedIn(request)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User " + loginCredentials.getUsername() + " is already logged in");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already logged in");
+        }
+        //If password is wrong => error
+        String encryptedPassword = userDAO.readLoginCredentials(loginCredentials.getUsername()).getPassword();
+        if (!passwordEncoder().matches(loginCredentials.getPassword(), encryptedPassword)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password not found");
         }
 
-        //Load user Object from database
-        com.web.forum.Entity.User loggedInUser = userRepository.findByName(loginCredentials.getUsername());
         //If username and password are correct => generate jwt token...
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
         log.info("Generate token: " + token);
@@ -179,7 +199,9 @@ public class UserService implements UserDetailsService {
                     //Extract jwt token
                     String jwtToken = cookie.getValue();
                     //Validate jwt token and delete if validated
-                    if (jwtToken != null || !jwtService.isTokenExpired(jwtToken)) {
+                    if (jwtToken != null
+                            || !jwtService.isTokenExpired(jwtToken)
+                            && userDAO.readName(jwtService.getUserName(jwtToken)) != null) {
                         //Create new cookie with same name and maxAge to 0 => delete Cookie
                         ResponseCookie newCookie = ResponseCookie.from("jwtToken", "")
                                 .httpOnly(true)

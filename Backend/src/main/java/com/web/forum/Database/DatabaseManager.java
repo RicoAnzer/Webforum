@@ -57,7 +57,7 @@ public class DatabaseManager {
             //Initialize table for users
             String createUserSQL = "CREATE TABLE IF NOT EXISTS users ("
                     + "id SERIAL PRIMARY KEY,"
-                    + "name VarChar(50), "
+                    + "name VarChar(20), "
                     + "password Text, "
                     + "profile_image_path VarChar(100), "
                     + "created_at VarChar(10), "

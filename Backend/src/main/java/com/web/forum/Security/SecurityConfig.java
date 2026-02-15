@@ -52,6 +52,7 @@ public class SecurityConfig {
             CorsConfiguration ccfg = new CorsConfiguration();
             //Allow access to React/vite port
             ccfg.setAllowedOrigins(Arrays.asList("https://localhost:5173"));
+            //ccfg.setAllowedOriginPatterns(List.of("*"));
             ccfg.setAllowedMethods(List.of("*"));
             ccfg.setAllowCredentials(true);
             ccfg.setAllowedHeaders(List.of("*"));
