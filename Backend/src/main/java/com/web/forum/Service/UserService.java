@@ -174,7 +174,7 @@ public class UserService implements UserDetailsService {
 
         //If username and password are correct => generate jwt token...
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
-        log.info("Generate token: " + token);
+        log.info("Log in success: " + loginCredentials.getUsername());
         //Send JWT token in an HTTP-Only cookie
         ResponseCookie cookie = ResponseCookie.
                 from("jwtToken", token)
@@ -211,7 +211,7 @@ public class UserService implements UserDetailsService {
                                 .sameSite("none")
                                 .build();
                         response.addHeader("Set-Cookie", newCookie.toString());
-                        log.info("Deleted token: " + jwtToken);
+                        log.info("Log out success: " + jwtService.getUserName(jwtToken));
                         return ResponseEntity.status(HttpStatus.OK).body("Logged out succesfully");
                     }
                 }

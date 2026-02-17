@@ -5,11 +5,13 @@ public class Topic {
 
     private final Long id;
     private final String name;
+    private final String slug;
 
     //Constructor
-    public Topic(Long id, String name) {
+    public Topic(Long id, String name, String slug) {
         this.id = id;
         this.name = name;
+        this.slug = slug;
     }
 
     //Getters
@@ -19,5 +21,9 @@ public class Topic {
 
     public String getName() {
         return name;
+    }
+
+    public String getSlug() {
+        return slug;
     }
 }

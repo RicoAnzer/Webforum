@@ -16,18 +16,23 @@ const header = {
 //Use react-router-dom Link to dynamically create pages
 const DisplayTopics = ({ topicsList }) => {
     const { setAddTopicVisible } = useAddTopicVisible()
-    return topicsList?.length > 0 ? (
-        <div className="topics-list">
-            {topicsList.map((topic) => (
-                <Link to={`/${topic.id}`} key={topic.id} className='topics-container'>
-                    <p className='secondary-text'>{topic.name}</p>
-                </Link>
-            ))}
-            <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
-                <p><FormattedMessage id="forum.form.addTopic" /></p>
-            </div>
+    return <div className="topics-list">
+        {topicsList?.length > 0 ? (
+            <>
+                {topicsList.map((topic) => (
+                    <Link to={`/${topic.slug}`}
+                        key={topic.id}
+                        state={{ topicId: topic.id }}
+                        className='topics-container'>
+                        <p className='secondary-text'>{topic.name}</p>
+                    </Link>
+                ))}
+            </>
+        ) : null}
+        <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
+            <p><FormattedMessage id="forum.form.addTopic" /></p>
         </div>
-    ) : null;
+    </div>
 };
 
 export const Header = () => {

@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict Tc3J4k6sTZIWhCSg2UaoIYSQAgbLP0fW5S25YS8obexeKA3fllTQKAYAnHspDvC
+\restrict IHnxuD94YAnz51mdrXpUit5llWNEIrZmFB0TkKf2edtZC3nmTeuhN8QC7E7XPVU
 
 -- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
@@ -99,7 +99,8 @@ ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
 CREATE TABLE public.threads (
     id integer NOT NULL,
     topic_id integer,
-    name character varying(100)
+    name character varying(100),
+    slug character varying(100)
 );
 
 
@@ -133,7 +134,8 @@ ALTER SEQUENCE public.threads_id_seq OWNED BY public.threads.id;
 
 CREATE TABLE public.topics (
     id integer NOT NULL,
-    name character varying(100)
+    name character varying(100),
+    slug character varying(100)
 );
 
 
@@ -179,7 +181,7 @@ ALTER TABLE public.user_roles OWNER TO postgres;
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    name character varying(50),
+    name character varying(20),
     password text,
     profile_image_path character varying(100),
     created_at character varying(10),
@@ -270,7 +272,7 @@ COPY public.roles (id, name) FROM stdin;
 -- Data for Name: threads; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.threads (id, topic_id, name) FROM stdin;
+COPY public.threads (id, topic_id, name, slug) FROM stdin;
 \.
 
 
@@ -278,7 +280,7 @@ COPY public.threads (id, topic_id, name) FROM stdin;
 -- Data for Name: topics; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.topics (id, name) FROM stdin;
+COPY public.topics (id, name, slug) FROM stdin;
 \.
 
 
@@ -287,7 +289,6 @@ COPY public.topics (id, name) FROM stdin;
 --
 
 COPY public.user_roles (user_id, role_id) FROM stdin;
-1	1
 \.
 
 
@@ -296,7 +297,6 @@ COPY public.user_roles (user_id, role_id) FROM stdin;
 --
 
 COPY public.users (id, name, password, profile_image_path, created_at, deleted_at, is_banned) FROM stdin;
-1	Dieter	$2a$10$Pveh4.T9nsYyKuyu8tdJEeo0W0iBdePaM38aMMfrVkwPmcQC03q7W		09-01-2026		f
 \.
 
 
@@ -332,7 +332,7 @@ SELECT pg_catalog.setval('public.topics_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
 
 
 --
@@ -419,5 +419,5 @@ ALTER TABLE ONLY public.user_roles
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Tc3J4k6sTZIWhCSg2UaoIYSQAgbLP0fW5S25YS8obexeKA3fllTQKAYAnHspDvC
+\unrestrict IHnxuD94YAnz51mdrXpUit5llWNEIrZmFB0TkKf2edtZC3nmTeuhN8QC7E7XPVU
 

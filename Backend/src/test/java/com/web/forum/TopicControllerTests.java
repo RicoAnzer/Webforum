@@ -62,7 +62,6 @@ public class TopicControllerTests {
     public void addTopic() throws Exception {
         log.info("Testing addTopic()...");
         String topicName = "ThirdTopic";
-        String roleAddResponse = "Topic '" + topicName + "' created";
 
         RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
                 .contentType(MediaType.APPLICATION_JSON);
@@ -70,7 +69,8 @@ public class TopicControllerTests {
         //Expect Status Created and check created message
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
-                .andExpect(content().string(roleAddResponse));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(topicName));
     }
 
     //Test addTopic when topic already exists
