@@ -30,7 +30,13 @@ public class SecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
                 //Allow everyone access to registration and login
-                .requestMatchers("/auth/login", "/auth/register", "/topic/*",  "/topic/*/*", "/role/*/*", "/user/*", "/user/*/*").permitAll()
+                .requestMatchers(
+                    "/auth/login", 
+                    "/auth/register",  
+                    "/topic/**", 
+                    "/thread/**",
+                    "/role/**", 
+                    "/user/**").permitAll()
                 //For logout user must have Role "USER" => Has to be logged in
                 .requestMatchers("/auth/logout").hasRole("USER")
                 //Must be logged in for everything else

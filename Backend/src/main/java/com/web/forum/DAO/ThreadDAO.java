@@ -13,29 +13,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import com.web.forum.DAO.Interfaces.ITopicDAO;
-import com.web.forum.Entity.Topic;
+import com.web.forum.DAO.Interfaces.IThreadDAO;
+import com.web.forum.Entity.Thread;
 import com.web.forum.ForumApplication;
 
 @Repository
-public class TopicDAO implements ITopicDAO {
+public class ThreadDAO implements IThreadDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(ThreadDAO.class);
     private final Connection connection;
 
     //Constructor
-    public TopicDAO(ForumApplication forumApplication) {
+    public ThreadDAO(ForumApplication forumApplication) {
         //Connect to database;
         this.connection = forumApplication.connection;
     }
 
-    //Save a new Topic to database
+    //Save a new Thread to database
     @Override
-    public Topic create(String name) {
-        //SQL Statement to add new Topics to database
-        String createSQL = "INSERT INTO topics (name, slug)"
-                + "VALUES (?, ?)"
-                + "RETURNING id, name, slug;";
+    public Thread create(String name, Long topicId) {
+        //SQL Statement to add new Threads to database
+        String createSQL = "INSERT INTO threads (topic_id, name, slug)"
+                + "VALUES (?, ?, ?)"
+                + "RETURNING id, topic_id, name, slug;";
 
         //Generate slug
         //Remove all non ASCII Symbols like "@"
@@ -52,20 +52,22 @@ public class TopicDAO implements ITopicDAO {
         slug = NON_ALPHANUMERIC.matcher(slug.toLowerCase())
                                       .replaceAll("-")
                                       .replaceAll("^-|-$", "");
-        Topic generatedTopic = null;
-        //Execute statement
+        Thread generatedThread = null;
+
         try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
-            //At creation of Topic 
+            //At creation of Thread 
             //=> id is automatically created inside database, doesn't need to be set here
-            statement.setString(1, name);
-            statement.setString(2, slug);
+            statement.setLong(1, topicId);
+            statement.setString(2, name);
+            statement.setString(3, slug);
             statement.execute();
 
-            //Return newly generated Topic
+            //Return newly generated Thread
             ResultSet result = statement.getResultSet();
             while (result.next()) {
-                generatedTopic = new Topic(
+                generatedThread = new Thread(
                         result.getLong("id"),
+                        result.getLong("topic_id"),
                         result.getString("name"),
                         result.getString("slug")
                 );
@@ -73,54 +75,27 @@ public class TopicDAO implements ITopicDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return generatedTopic;
+        return generatedThread;
     }
 
-    //Search and return Topics based on ID
+    //Search and return Threads based on ID
     @Override
-    public Topic readbyID(Long ID) {
-        //SQL Statement to return Topic of a specific ID
-        String readSQL = "Select * FROM topics WHERE id = ?;";
-        //Topic placeholder
-        Topic topic = null;
-        //Execute statement
-        try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
-            statement.setLong(1, ID);
-            ResultSet result = statement.executeQuery();
-            //Create new Topic Object using results from statement above
-            while (result.next()) {
-                //For every entry...
-                //...create new Topic Object...
-                topic = new Topic(
-                        result.getLong("id"),
-                        result.getString("name"),
-                        result.getString("slug")
-                );
-
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-        }
-        return topic;
-    }
-
-    //Find and return Topic in database based on name
-    @Override
-    public Topic readbyName(String name) {
-        //SQL Statement to return all Topics
-        String readSQL = "Select * FROM topics WHERE name = ?;";
-        //Topic placeholder
-        Topic topic = null;
+    public Thread readByName(String name) {
+        //SQL Statement to return Thread of specific ID
+        String readSQL = "Select * FROM threads WHERE name = ?;";
+        //Thread placeholder
+        Thread thread = null;
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
             statement.setString(1, name);
             ResultSet result = statement.executeQuery();
-            //Create new Topic Object using results from statement above
+            //Create new Thread Object using results from statement above
             while (result.next()) {
                 //For every entry...
-                //...create new Topic Object...
-                topic = new Topic(
+                //...create new Thread Object...
+                thread = new Thread(
                         result.getLong("id"),
+                        result.getLong("topic_id"),
                         result.getString("name"),
                         result.getString("slug")
                 );
@@ -129,42 +104,44 @@ public class TopicDAO implements ITopicDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return topic;
+        return thread;
     }
 
-    //Search and return all Topics
+    //Search and return Threads related to a sepcific Topic
     @Override
-    public List<Topic> readAll() {
-        //SQL Statement to return all Topics
-        String readSQL = "Select * FROM topics;";
-        //Topic placeholder
-        List<Topic> topics = new ArrayList<>();
+    public List<Thread> readAll(Long topicId) {
+        //SQL Statement to return all Threads of a specific Topic
+        String readSQL = "Select * FROM threads WHERE topic_id = ?;";
+        //Thread placeholder
+        List<Thread> threads = new ArrayList<>();
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
+            statement.setLong(1, topicId);
             ResultSet result = statement.executeQuery();
-            //Create new Topic Objects using results from statement above
+            //Create new Threads Objects using results from statement above
             while (result.next()) {
                 //For every entry...
-                //...create new Topic Object...
-                Topic topic = new Topic(
+                //...create new Thread Object...
+                Thread thread = new Thread(
                         result.getLong("id"),
+                        result.getLong("topic_id"),
                         result.getString("name"),
                         result.getString("slug")
                 );
-                topics.add(topic);
+                threads.add(thread);
 
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return topics;
+        return threads;
     }
 
-    //Delete existing Topic based on name
+    //Delete existing Thread based on name
     @Override
     public String delete(String name) {
         //SQL Statement to delete Topic
-        String deleteSQL = "DELETE FROM topics WHERE name = ?;";
+        String deleteSQL = "DELETE FROM threads WHERE name = ?;";
         //execute statement
         try (PreparedStatement statement = connection.prepareStatement(deleteSQL)) {
             statement.setString(1, name);
@@ -172,6 +149,6 @@ public class TopicDAO implements ITopicDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return "Topic deleted";
+        return "Thread deleted";
     }
 }

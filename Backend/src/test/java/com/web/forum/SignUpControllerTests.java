@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.web.forum.DAO.TopicDAO;
 import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
@@ -49,7 +48,7 @@ public class SignUpControllerTests {
     private RegistrationRequest regRequest;
     private LoginCredentials credentials;
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(SignUpControllerTests.class);
 
     @BeforeAll
     public void setUp() {

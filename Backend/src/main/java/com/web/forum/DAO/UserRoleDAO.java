@@ -21,7 +21,7 @@ import com.web.forum.ForumApplication;
 @Repository
 public class UserRoleDAO implements IUserRoleDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(UserRoleDAO.class);
     private final Connection connection;
 
     @Autowired

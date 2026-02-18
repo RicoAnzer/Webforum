@@ -16,7 +16,7 @@ import com.web.forum.ForumApplication;
 @Repository
 public class RoleDAO implements IRoleDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(RoleDAO.class);
     private final Connection connection;
 
     //Constructor
@@ -53,6 +53,32 @@ public class RoleDAO implements IRoleDAO {
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
             statement.setLong(1, ID);
+            ResultSet result = statement.executeQuery();
+            //Create new Role Object using results from statement above
+            while (result.next()) {
+                //For every entry...
+                //...create new Role Object
+                role = new Role(
+                        result.getInt("id"),
+                        result.getString("name")
+                );
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
+        return role;
+    }
+
+    //Find specific Role based on name
+    @Override
+    public Role readByName(String name) {
+        //SQL Statement to filter Role where id equals parameter ID
+        String readSQL = "Select * FROM roles WHERE name = ?;";
+        //Role placeholder
+        Role role = null;
+        //Execute statement
+        try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
+            statement.setString(1, name);
             ResultSet result = statement.executeQuery();
             //Create new Role Object using results from statement above
             while (result.next()) {

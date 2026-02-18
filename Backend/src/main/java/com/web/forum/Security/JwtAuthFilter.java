@@ -61,7 +61,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Check if logged in
         if (!jwtService.isLoggedIn(request)) {
-            logger.info("No token, not logged in");
             return;
             //If logged in => extract jwt token
         } else {

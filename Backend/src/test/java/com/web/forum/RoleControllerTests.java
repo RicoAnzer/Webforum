@@ -19,8 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.web.forum.DAO.TopicDAO;
-
 //Integration tests for RoleController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
 @SpringBootTest
@@ -32,7 +30,7 @@ public class RoleControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(RoleControllerTests.class);
 
     @BeforeAll
     public void setUp(){
@@ -62,9 +60,28 @@ public class RoleControllerTests {
                 .andExpect(content().string(responseMessage));
     }
 
-    //Test deleteRole
+    //Test addRole when name already exists
     @SuppressWarnings("null")
     @Order(2)
+    @Test
+    public void addRoleNameExists() throws Exception {
+        log.info("Testing addRoleNameExists()...");
+        String roleName = "Role1";
+        String errorMessage = "Role with this name already exists";
+
+        RequestBuilder request = MockMvcRequestBuilders.post("/role/add/{roleName}", roleName)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        //Expect Status Conflict and check error message
+        mockMvc.perform(request)
+                .andExpect(status().isConflict())
+                .andExpect(content().string(errorMessage));
+    }
+
+
+    //Test deleteRole
+    @SuppressWarnings("null")
+    @Order(3)
     @Test
     public void deleteRole() throws Exception {
         log.info("Testing deleteRole()...");

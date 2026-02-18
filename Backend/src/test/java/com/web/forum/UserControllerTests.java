@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.web.forum.DAO.TopicDAO;
 import com.web.forum.DAO.UserDAO;
 import com.web.forum.Entity.User;
 
@@ -49,7 +48,7 @@ class UserControllerTests {
     User mockUser = null;
     User mockUser2 = null;
 
-    private static final Logger log = LoggerFactory.getLogger(TopicDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(UserControllerTests.class);
 
     @BeforeAll
     public void setUp() {

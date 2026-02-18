@@ -10,6 +10,9 @@ public interface IRoleDAO {
     //Find specific Role based on ID
     public Role read(int ID);
 
+    //Find specific Role based on name
+    public Role readByName(String name);
+
     //Delete existing Role
     public String delete(String roleName);
 }

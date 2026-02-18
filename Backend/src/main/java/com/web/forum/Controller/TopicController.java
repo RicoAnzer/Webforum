@@ -25,10 +25,21 @@ public class TopicController {
     //Add a new Topic
     @PostMapping("/add/{name}")
     public ResponseEntity<?> addTopic(@PathVariable String name) {
-        if (topicDAO.readbyName(name) == null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(topicDAO.create(name));
-        }else{
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+        if (topicDAO.readbyName(name) != null) {
+             return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(topicDAO.create(name));
+    }
+
+    //Return Topic based on ID
+    @GetMapping("/get/{ID}")
+    public ResponseEntity<?> getTopic(@PathVariable Long ID) {
+        Topic foundTopic = topicDAO.readbyID(ID);
+        if (foundTopic != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(foundTopic);
+        } else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topic found");
         }
     }
 
@@ -42,17 +53,6 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(topics);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topics found");
-        }
-    }
-
-    //Return Topic based on ID
-    @GetMapping("/get/{ID}")
-    public ResponseEntity<?> getTopic(@PathVariable Long ID) {
-        Topic foundTopic = topicDAO.readbyID(ID);
-        if (foundTopic != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(foundTopic);
-        } else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topic found");
         }
     }
 
