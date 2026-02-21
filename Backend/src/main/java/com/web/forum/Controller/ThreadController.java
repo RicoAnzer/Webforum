@@ -23,8 +23,11 @@ public class ThreadController {
     private ThreadDAO threadDAO;
 
     //Add a new Thread
-    @PostMapping("/add/{topicId}/{threadName}")
-    public ResponseEntity<?> addThread(@PathVariable String threadName, @PathVariable Long topicId) {
+    @PostMapping(value = {"/add/{topicId}/{threadName}", "/add/{topicId}/"})
+    public ResponseEntity<?> addThread(@PathVariable Long topicId, @PathVariable (required = false) String threadName) {
+        if (threadName == null || threadName.trim().isEmpty()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Thread name is empty");
+        }
         if (threadDAO.readByName(threadName) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Thread with this name already exists");
         }

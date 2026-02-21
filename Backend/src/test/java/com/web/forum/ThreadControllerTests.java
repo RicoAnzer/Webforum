@@ -37,10 +37,8 @@ public class ThreadControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     public ThreadDAO threadDAO;
-
     @Autowired
     public TopicDAO topicDAO;
 
@@ -64,7 +62,6 @@ public class ThreadControllerTests {
         threadDAO.delete("Second Thread");
         topicDAO.delete("First Test Topic");
     }
-
 
     //Test addThread when successful
     @SuppressWarnings("null")

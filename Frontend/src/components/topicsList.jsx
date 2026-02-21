@@ -20,7 +20,7 @@ const DisplayTopics = ({ topicsList }) => {
         {topicsList?.length > 0 ? (
             <>
                 {topicsList.map((topic) => (
-                    <Link to={`/${topic.slug}`}
+                    <Link to={`${topic.slug}`}
                         key={topic.id}
                         state={{ topicId: topic.id }}
                         className='topics-container'>
@@ -71,7 +71,31 @@ export const Header = () => {
 
     //Load Topics at start
     useEffect(() => {
+        //Boolean to prevent race condition (One response takes longer and overwrites others using older data)
+        let isCurrent = true;
+        //Load Topics and fill list
+        const getTopics = async () => {
+            try {
+                const response = await axios
+                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic/getAll`, {
+                        withCredentials: true,
+                        headers: header
+                    })
+                //Update only, if useEffect hasn't been reset
+                if (isCurrent) {
+                    setTopics(response?.data);
+                }
+            } catch (error) {
+                if (isCurrent) {
+                    console.log(error?.response?.data);
+                }
+            }
+        }
         getTopics()
+        //Reset boolean if finished
+        return () => {
+            isCurrent = false;
+        };
     }, []);
 
     return (
@@ -86,7 +110,7 @@ export const Header = () => {
 
                 {/**Display if logged out*/}
                 {user == null &&
-                    <div className='login-buttons'>
+                    <div className='button-holder'>
                         <button type="button" onClick={() => setLoginVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
                         <button type="button" onClick={() => setSignUpVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
                     </div>

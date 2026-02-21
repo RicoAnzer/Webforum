@@ -35,7 +35,6 @@ public class TopicControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     public TopicDAO topicDAO;
 

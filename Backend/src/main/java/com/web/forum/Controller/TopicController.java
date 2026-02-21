@@ -23,12 +23,14 @@ public class TopicController {
     private TopicDAO topicDAO;
 
     //Add a new Topic
-    @PostMapping("/add/{name}")
-    public ResponseEntity<?> addTopic(@PathVariable String name) {
-        if (topicDAO.readbyName(name) != null) {
-             return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+    @PostMapping(value = {"/add/{name}", "/add/"})
+    public ResponseEntity<?> addTopic(@PathVariable(required = false) String name) {
+        if (name == null || name.trim().isEmpty()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic is empty");
         }
-
+        if (topicDAO.readbyName(name) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Topic with this name already exists");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(topicDAO.create(name));
     }
 
@@ -38,7 +40,7 @@ public class TopicController {
         Topic foundTopic = topicDAO.readbyID(ID);
         if (foundTopic != null) {
             return ResponseEntity.status(HttpStatus.OK).body(foundTopic);
-        } else{
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Topic found");
         }
     }

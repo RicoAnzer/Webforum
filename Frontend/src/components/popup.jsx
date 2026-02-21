@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNameInput, usePasswordInput, useConfirmPasswordInput, useAddTopicInput } from '../global-variables/PopupData.jsx';
+import { useNameInput, usePasswordInput, useConfirmPasswordInput, useAddTopicInput, useAddThreadInput } from '../global-variables/PopupData.jsx';
 
 //Internationalization of placeholders
 function namePlaceholder() {
@@ -24,6 +24,13 @@ function addTopicPlaceholder() {
     const intl = useIntl();
     return intl.formatMessage({
         id: 'forum.form.addTopic.placeholder',
+    });
+}
+
+function addThreadPlaceholder() {
+    const intl = useIntl();
+    return intl.formatMessage({
+        id: 'forum.form.addThread.placeholder',
     });
 }
 
@@ -81,6 +88,20 @@ export const AddTopicInput = () => {
                 placeholder={addTopicPlaceholder()}
                 value={addTopicInput}
                 onChange={(e) => setAddTopicInput(e.target.value)}
+            />
+        </div>
+    )
+}
+
+export const AddThreadInput = () => {
+    const { addThreadInput, setAddThreadInput } = useAddThreadInput();
+    return (
+        <div className="form-group">
+            <input type="text"
+                name="addThread"
+                placeholder={addThreadPlaceholder()}
+                value={addThreadInput}
+                onChange={(e) => setAddThreadInput(e.target.value)}
             />
         </div>
     )

@@ -1,0 +1,19 @@
+@import url('Variables.css');
+.thread-container {
+    width: 100%;
+    padding: 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    overflow-wrap: break-word;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.thread-container p {
+  margin: 0;
+}
+
+.thread-container:hover {
+  background: var(--secondary-background-hover-color);
+}

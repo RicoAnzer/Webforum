@@ -40,7 +40,6 @@ class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     public UserDAO userDAO;
 
