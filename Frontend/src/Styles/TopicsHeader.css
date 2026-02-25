@@ -5,6 +5,7 @@ header {
   background: var(--secondary-background-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  margin: 10px;
 }
 
 .topics-list {
@@ -42,7 +43,7 @@ header {
   margin-left: auto;
 }
 
-.profile-container .login-buttons {
+.button-holder {
   display: flex;
    gap: 10px;
 }

@@ -21,6 +21,10 @@ public class RoleController {
     //Add new Role
     @PostMapping("/add/{roleName}")
     public ResponseEntity<?> addRole(@PathVariable String roleName) {
+        if (roleDAO.readByName(roleName) != null) {
+             return ResponseEntity.status(HttpStatus.CONFLICT).body("Role with this name already exists");
+        }
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(roleDAO.create(roleName));
     }
 

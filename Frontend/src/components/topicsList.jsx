@@ -16,18 +16,23 @@ const header = {
 //Use react-router-dom Link to dynamically create pages
 const DisplayTopics = ({ topicsList }) => {
     const { setAddTopicVisible } = useAddTopicVisible()
-    return topicsList?.length > 0 ? (
-        <div className="topics-list">
-            {topicsList.map((topic) => (
-                <Link to={`/${topic.id}`} key={topic.id} className='topics-container'>
-                    <p className='secondary-text'>{topic.name}</p>
-                </Link>
-            ))}
-            <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
-                <p><FormattedMessage id="forum.form.addTopic" /></p>
-            </div>
+    return <div className="topics-list">
+        {topicsList?.length > 0 ? (
+            <>
+                {topicsList.map((topic) => (
+                    <Link to={`${topic.slug}`}
+                        key={topic.id}
+                        state={{ topicId: topic.id }}
+                        className='topics-container'>
+                        <p className='secondary-text'>{topic.name}</p>
+                    </Link>
+                ))}
+            </>
+        ) : null}
+        <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
+            <p><FormattedMessage id="forum.form.addTopic" /></p>
         </div>
-    ) : null;
+    </div>
 };
 
 export const Header = () => {
@@ -66,7 +71,31 @@ export const Header = () => {
 
     //Load Topics at start
     useEffect(() => {
+        //Boolean to prevent race condition (One response takes longer and overwrites others using older data)
+        let isCurrent = true;
+        //Load Topics and fill list
+        const getTopics = async () => {
+            try {
+                const response = await axios
+                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic/getAll`, {
+                        withCredentials: true,
+                        headers: header
+                    })
+                //Update only, if useEffect hasn't been reset
+                if (isCurrent) {
+                    setTopics(response?.data);
+                }
+            } catch (error) {
+                if (isCurrent) {
+                    console.log(error?.response?.data);
+                }
+            }
+        }
         getTopics()
+        //Reset boolean if finished
+        return () => {
+            isCurrent = false;
+        };
     }, []);
 
     return (
@@ -81,7 +110,7 @@ export const Header = () => {
 
                 {/**Display if logged out*/}
                 {user == null &&
-                    <div className='login-buttons'>
+                    <div className='button-holder'>
                         <button type="button" onClick={() => setLoginVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
                         <button type="button" onClick={() => setSignUpVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
                     </div>

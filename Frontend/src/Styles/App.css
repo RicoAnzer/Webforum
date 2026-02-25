@@ -59,3 +59,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.main-container {
+  flex: 1;
+  margin: 0px 10px 10px 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--secondary-background-color);
+}

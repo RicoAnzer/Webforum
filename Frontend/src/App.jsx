@@ -1,28 +1,23 @@
 import axios from 'axios';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
-import { useState } from 'react';
-import { FormattedMessage, IntlProvider } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useError, DisplayErrorMessage } from './global-variables/ErrorMessage.jsx'
 import { useUser } from './global-variables/SignedInUser.jsx';
 import { useTopics } from './global-variables/Topics.jsx'
 import {
   useAddTopicInput, useConfirmPasswordInput, useNameInput, usePasswordInput,
-  useSignUpVisible, useLoginVisible, useAddTopicVisible,
+  useSignUpVisible, useLoginVisible, useAddTopicVisible
 } from './global-variables/PopupData.jsx'
-import { ThreadList } from './pages/ThreadList.jsx';
 import {
   NameInput, PasswordInput, ConfirmPasswordInput, AddTopicInput
 } from "./components/popup.jsx";
 //Import external components
 import { Header } from './components/topicsList.jsx'
+import { ThreadList } from './pages/ThreadList.jsx';
+import { Thread } from './pages/Thread.jsx';
 //Import CSS styles
 import './Styles/App.css'
-import './Styles/Forum.css';
 import './Styles/Popup.css';
-
-//Import routing pages
-//Import locale files containing translations
-import messages_en from './locales/en.json';
 
 //Function to display global variable errorMessage => if errorMessage is null, make errorDisplay invisible
 function ErrorDisplay() {
@@ -30,14 +25,9 @@ function ErrorDisplay() {
   return errorMessage !== '' ? <DisplayErrorMessage /> : null;
 }
 
-//List locale files to iterate through to switch language
-const messages = {
-  en: messages_en,
-};
-
 function App() {
-  //Starting language
-  const [state] = useState({ locale: 'en' })
+  const intl = useIntl();
+  const defaultError = intl.formatMessage({ id: "error.unexpected" });
 
   const { setErrorMessage } = useError()
   const { setTopics } = useTopics()
@@ -145,71 +135,79 @@ function App() {
       setAddTopicInput("")
     }
     catch (error) {
-      console.log(error.response?.data);
+      switch (error.response?.data) {
+        case "Topic is empty":
+          setErrorMessage(<FormattedMessage id="error.addTopic.empty" />)
+          break;
+        case "Topic with this name already exists":
+          setErrorMessage(<FormattedMessage id="error.addTopic.topicExists" />)
+          break;
+        default:
+          const fullError = `${defaultError}: ${error?.response?.data || 'Unknown Error'}`
+          setErrorMessage(fullError)
+          break;
+      }
     }
   }
 
   return (
-    <IntlProvider locale={state.locale}
-      messages={messages[state.locale]}>
-      <div className="main">
-        <BrowserRouter >
-          <Header></Header>
-          <div className='main-container'>
+    <div className="main">
+      <BrowserRouter >
+        <Header></Header>
+        <div className='main-container'>
+          {/**Sign up popup */}
+          {signUpVisible &&
+            <div className="register-container popup register">
+              <h1 className='headline'><FormattedMessage id="forum.form.register" /></h1>
+              <form className="register-form" onSubmit={signUp}>
+                <NameInput />
+                <PasswordInput />
+                <ConfirmPasswordInput />
+                <ErrorDisplay />
+                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+              </form>
 
-            {/**Sign up popup */}
-            {signUpVisible &&
-              <div className="register-container popup register">
-                <h1 className='headline'><FormattedMessage id="forum.form.register" /></h1>
-                <form className="register-form" onSubmit={signUp}>
-                  <NameInput />
-                  <PasswordInput />
-                  <ConfirmPasswordInput />
-                  <ErrorDisplay />
-                  <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
-                </form>
-
-                <div className="hint">
-                  <FormattedMessage id="forum.form.register.hint" /> <a href="/login"><FormattedMessage id="forum.form.login" /></a>
-                </div>
+              <div className="hint">
+                <FormattedMessage id="forum.form.register.hint" /> <a href="/login"><FormattedMessage id="forum.form.login" /></a>
               </div>
-            }
+            </div>
+          }
 
-            {/**Log in popup */}
-            {loginVisible &&
-              <div className="register-container popup login">
-                <h1 className='headline'><FormattedMessage id="forum.form.login" /></h1>
-                <form className="register-form" onSubmit={login}>
-                  <NameInput />
-                  <PasswordInput />
-                  <ErrorDisplay />
-                  <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
-                </form>
+          {/**Log in popup */}
+          {loginVisible &&
+            <div className="register-container popup login">
+              <h1 className='headline'><FormattedMessage id="forum.form.login" /></h1>
+              <form className="register-form" onSubmit={login}>
+                <NameInput />
+                <PasswordInput />
+                <ErrorDisplay />
+                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+              </form>
 
-                <div className="hint">
-                  <FormattedMessage id="forum.form.login.hint" /> <a href="/signup"><FormattedMessage id="forum.form.register" /></a>
-                </div>
+              <div className="hint">
+                <FormattedMessage id="forum.form.login.hint" /> <a href="/signup"><FormattedMessage id="forum.form.register" /></a>
               </div>
-            }
+            </div>
+          }
 
-            {/**Add topic popup */}
-            {addTopicVisible &&
-              <div className="register-container popup addTopic">
-                <h1 className='headline'><FormattedMessage id="forum.form.addTopic" /></h1>
-                <form className="register-form" onSubmit={addTopic}>
-                  <AddTopicInput />
-                  <ErrorDisplay />
-                  <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
-                </form>
-              </div>
-            }
-            <Routes >
-              <Route path="/:topicId" element={<ThreadList />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </div>
-    </IntlProvider>
+          {/**Add topic popup */}
+          {addTopicVisible &&
+            <div className="register-container popup addTopic">
+              <h1 className='headline'><FormattedMessage id="forum.form.addTopic" /></h1>
+              <form className="register-form" onSubmit={addTopic}>
+                <AddTopicInput />
+                <ErrorDisplay />
+                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
+              </form>
+            </div>
+          }
+          <Routes >
+            <Route path=":topicId" element={<ThreadList />} />
+            <Route path=":topicId/:threadId" element={<Thread />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </div>
   )
 }
 export default App

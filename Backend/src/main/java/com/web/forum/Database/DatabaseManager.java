@@ -35,13 +35,15 @@ public class DatabaseManager {
             //Initialize table for topics
             String createTopicSQL = "CREATE TABLE IF NOT EXISTS topics ("
                     + "id SERIAL PRIMARY KEY,"
-                    + "name VarChar(100) "
+                    + "name VarChar(100), "
+                    + "slug VarChar(100) "
                     + ")";
             //Initialize table for threads
             String createThreadSQL = "CREATE TABLE IF NOT EXISTS threads ("
                     + "id SERIAL PRIMARY KEY,"
                     + "topic_id INT, "
                     + "name VarChar(100), "
+                    + "slug VarChar(100), "
                     + "CONSTRAINT fk_topic_id FOREIGN KEY (topic_id)"
                     + "REFERENCES topics(id) ON DELETE CASCADE"
                     + ")";

@@ -27,7 +27,6 @@ import com.web.forum.DAO.UserRoleDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
 import com.web.forum.Entity.Role;
-import com.web.forum.Security.JwtAuthFilter;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +46,7 @@ public class UserService implements UserDetailsService {
     private JwtService jwtService;
 
     //Logger
-    private final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -172,9 +171,9 @@ public class UserService implements UserDetailsService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password not found");
         }
 
-        //If username and password are correct => generate jwt token...
+        //If username and password are correct => generate jwt token
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
-        log.info("Generate token: " + token);
+        log.info("Log in success: " + loginCredentials.getUsername());
         //Send JWT token in an HTTP-Only cookie
         ResponseCookie cookie = ResponseCookie.
                 from("jwtToken", token)
@@ -211,7 +210,7 @@ public class UserService implements UserDetailsService {
                                 .sameSite("none")
                                 .build();
                         response.addHeader("Set-Cookie", newCookie.toString());
-                        log.info("Deleted token: " + jwtToken);
+                        log.info("Log out success: " + jwtService.getUserName(jwtToken));
                         return ResponseEntity.status(HttpStatus.OK).body("Logged out succesfully");
                     }
                 }
