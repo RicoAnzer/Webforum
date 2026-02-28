@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict IHnxuD94YAnz51mdrXpUit5llWNEIrZmFB0TkKf2edtZC3nmTeuhN8QC7E7XPVU
+\restrict tQdnox6wkdhgFKL1M66d0alQoNnR49RCPVgyh10Q9zrIJN4wOoHKshZdsH8Jsbw
 
 -- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
@@ -29,7 +29,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     id integer NOT NULL,
     user_id integer,
-    thread_id integer,
+    thread_slug character varying(50),
     content jsonb
 );
 
@@ -98,9 +98,9 @@ ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
 
 CREATE TABLE public.threads (
     id integer NOT NULL,
-    topic_id integer,
-    name character varying(100),
-    slug character varying(100)
+    topic_slug character varying(50),
+    name character varying(50),
+    slug character varying(50)
 );
 
 
@@ -134,8 +134,8 @@ ALTER SEQUENCE public.threads_id_seq OWNED BY public.threads.id;
 
 CREATE TABLE public.topics (
     id integer NOT NULL,
-    name character varying(100),
-    slug character varying(100)
+    name character varying(50),
+    slug character varying(50)
 );
 
 
@@ -253,7 +253,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.posts (id, user_id, thread_id, content) FROM stdin;
+COPY public.posts (id, user_id, thread_slug, content) FROM stdin;
 \.
 
 
@@ -272,7 +272,7 @@ COPY public.roles (id, name) FROM stdin;
 -- Data for Name: threads; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.threads (id, topic_id, name, slug) FROM stdin;
+COPY public.threads (id, topic_slug, name, slug) FROM stdin;
 \.
 
 
@@ -360,11 +360,27 @@ ALTER TABLE ONLY public.threads
 
 
 --
+-- Name: threads threads_slug_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.threads
+    ADD CONSTRAINT threads_slug_key UNIQUE (slug);
+
+
+--
 -- Name: topics topics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.topics
     ADD CONSTRAINT topics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: topics topics_slug_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.topics
+    ADD CONSTRAINT topics_slug_key UNIQUE (slug);
 
 
 --
@@ -384,19 +400,19 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
--- Name: posts fk_thread_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: posts fk_thread_slug; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT fk_thread_id FOREIGN KEY (thread_id) REFERENCES public.threads(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_thread_slug FOREIGN KEY (thread_slug) REFERENCES public.threads(slug) ON DELETE CASCADE;
 
 
 --
--- Name: threads fk_topic_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: threads fk_topic_slug; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.threads
-    ADD CONSTRAINT fk_topic_id FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_topic_slug FOREIGN KEY (topic_slug) REFERENCES public.topics(slug) ON DELETE CASCADE;
 
 
 --
@@ -419,5 +435,5 @@ ALTER TABLE ONLY public.user_roles
 -- PostgreSQL database dump complete
 --
 
-\unrestrict IHnxuD94YAnz51mdrXpUit5llWNEIrZmFB0TkKf2edtZC3nmTeuhN8QC7E7XPVU
+\unrestrict tQdnox6wkdhgFKL1M66d0alQoNnR49RCPVgyh10Q9zrIJN4wOoHKshZdsH8Jsbw
 

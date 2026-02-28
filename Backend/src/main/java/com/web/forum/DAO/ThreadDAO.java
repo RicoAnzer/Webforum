@@ -31,11 +31,11 @@ public class ThreadDAO implements IThreadDAO {
 
     //Save a new Thread to database
     @Override
-    public Thread create(String name, Long topicId) {
+    public Thread create(String name, String topicSlug) {
         //SQL Statement to add new Threads to database
-        String createSQL = "INSERT INTO threads (topic_id, name, slug)"
+        String createSQL = "INSERT INTO threads (topic_slug, name, slug)"
                 + "VALUES (?, ?, ?)"
-                + "RETURNING id, topic_id, name, slug;";
+                + "RETURNING id, topic_slug, name, slug;";
 
         //Generate slug
         //Remove all non ASCII Symbols like "@"
@@ -57,7 +57,7 @@ public class ThreadDAO implements IThreadDAO {
         try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
             //At creation of Thread 
             //=> id is automatically created inside database, doesn't need to be set here
-            statement.setLong(1, topicId);
+            statement.setString(1, topicSlug);
             statement.setString(2, name);
             statement.setString(3, slug);
             statement.execute();
@@ -67,7 +67,7 @@ public class ThreadDAO implements IThreadDAO {
             while (result.next()) {
                 generatedThread = new Thread(
                         result.getLong("id"),
-                        result.getLong("topic_id"),
+                        result.getString("topic_slug"),
                         result.getString("name"),
                         result.getString("slug")
                 );
@@ -95,7 +95,7 @@ public class ThreadDAO implements IThreadDAO {
                 //...create new Thread Object...
                 thread = new Thread(
                         result.getLong("id"),
-                        result.getLong("topic_id"),
+                        result.getString("topic_slug"),
                         result.getString("name"),
                         result.getString("slug")
                 );
@@ -109,14 +109,14 @@ public class ThreadDAO implements IThreadDAO {
 
     //Search and return Threads related to a sepcific Topic
     @Override
-    public List<Thread> readAll(Long topicId) {
+    public List<Thread> readAll(String topicSlug) {
         //SQL Statement to return all Threads of a specific Topic
-        String readSQL = "Select * FROM threads WHERE topic_id = ?;";
+        String readSQL = "Select * FROM threads WHERE topic_slug = ?;";
         //Thread placeholder
         List<Thread> threads = new ArrayList<>();
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(readSQL)) {
-            statement.setLong(1, topicId);
+            statement.setString(1, topicSlug);
             ResultSet result = statement.executeQuery();
             //Create new Threads Objects using results from statement above
             while (result.next()) {
@@ -124,7 +124,7 @@ public class ThreadDAO implements IThreadDAO {
                 //...create new Thread Object...
                 Thread thread = new Thread(
                         result.getLong("id"),
-                        result.getLong("topic_id"),
+                        result.getString("topic_slug"),
                         result.getString("name"),
                         result.getString("slug")
                 );

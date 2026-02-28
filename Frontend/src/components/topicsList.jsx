@@ -22,7 +22,6 @@ const DisplayTopics = ({ topicsList }) => {
                 {topicsList.map((topic) => (
                     <Link to={`${topic.slug}`}
                         key={topic.id}
-                        state={{ topicId: topic.id }}
                         className='topics-container'>
                         <p className='secondary-text'>{topic.name}</p>
                     </Link>
@@ -40,19 +39,6 @@ export const Header = () => {
     const { user, setUser } = useUser()
     const { setSignUpVisible } = useSignUpVisible()
     const { setLoginVisible } = useLoginVisible()
-
-    function getTopics() {
-        return axios
-            .get(`https://${import.meta.env.VITE_SPRING_URL}/topic/getAll`, {
-                withCredentials: true,
-                headers: header
-            }).then(response => {
-                setTopics(response?.data);
-            })
-            .catch(error => {
-                console.log(error?.response?.data);
-            });
-    }
 
     async function logout() {
         try {

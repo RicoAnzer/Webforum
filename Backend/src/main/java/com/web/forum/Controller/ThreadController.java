@@ -23,8 +23,8 @@ public class ThreadController {
     private ThreadDAO threadDAO;
 
     //Add a new Thread
-    @PostMapping(value = {"/add/{topicId}/{threadName}", "/add/{topicId}/"})
-    public ResponseEntity<?> addThread(@PathVariable Long topicId, @PathVariable (required = false) String threadName) {
+    @PostMapping(value = {"/add/{topicSlug}/{threadName}", "/add/{topicSlug}/"})
+    public ResponseEntity<?> addThread(@PathVariable String topicSlug, @PathVariable (required = false) String threadName) {
         if (threadName == null || threadName.trim().isEmpty()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Thread name is empty");
         }
@@ -32,7 +32,7 @@ public class ThreadController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Thread with this name already exists");
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(threadDAO.create(threadName, topicId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(threadDAO.create(threadName, topicSlug));
     }
 
     //Return Thread based on name
@@ -47,16 +47,11 @@ public class ThreadController {
     }
 
     //Return all Threads of a specific Topic
-    @GetMapping("/getAll/{topicId}")
-    public ResponseEntity<?> getAllThreads(@PathVariable Long topicId) {
+    @GetMapping("/getAll/{topicSlug}")
+    public ResponseEntity<?> getAllThreads(@PathVariable String topicSlug) {
         //Get a List of all Threads Objects of a specific Topic
-        List<Thread> threads = threadDAO.readAll(topicId);
-        if (threads != null && !threads.isEmpty()) {
-            //Return threads list
-            return ResponseEntity.status(HttpStatus.OK).body(threads);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Threads found");
-        }
+        List<Thread> threads = threadDAO.readAll(topicSlug);
+        return ResponseEntity.status(HttpStatus.OK).body(threads);
     }
 
     //Deletes Thread by name

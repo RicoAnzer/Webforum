@@ -35,17 +35,17 @@ public class DatabaseManager {
             //Initialize table for topics
             String createTopicSQL = "CREATE TABLE IF NOT EXISTS topics ("
                     + "id SERIAL PRIMARY KEY,"
-                    + "name VarChar(100), "
-                    + "slug VarChar(100) "
+                    + "name VarChar(50), "
+                    + "slug VarChar(50) UNIQUE"
                     + ")";
             //Initialize table for threads
             String createThreadSQL = "CREATE TABLE IF NOT EXISTS threads ("
                     + "id SERIAL PRIMARY KEY,"
-                    + "topic_id INT, "
-                    + "name VarChar(100), "
-                    + "slug VarChar(100), "
-                    + "CONSTRAINT fk_topic_id FOREIGN KEY (topic_id)"
-                    + "REFERENCES topics(id) ON DELETE CASCADE"
+                    + "topic_slug VarChar(50), "
+                    + "name VarChar(50), "
+                    + "slug VarChar(50) UNIQUE, "
+                    + "CONSTRAINT fk_topic_slug FOREIGN KEY (topic_slug)"
+                    + "REFERENCES topics(slug) ON DELETE CASCADE"
                     + ")";
             //Initialize table for roles
             String createRoleSQL = "CREATE TABLE IF NOT EXISTS roles ("
@@ -83,12 +83,12 @@ public class DatabaseManager {
             String createPostSQL = "CREATE TABLE IF NOT EXISTS posts ("
                     + "id SERIAL PRIMARY KEY,"
                     + "user_id INT, "
-                    + "thread_id INT, "
+                    + "thread_slug VarChar(50), "
                     + "content JSONB, "
                     + "CONSTRAINT fk_user_id FOREIGN KEY (user_id)"
                     + "REFERENCES users(id) ON DELETE SET NULL,"
-                    + "CONSTRAINT fk_thread_id FOREIGN KEY (thread_id)"
-                    + "REFERENCES threads(id) ON DELETE CASCADE"
+                    + "CONSTRAINT fk_thread_slug FOREIGN KEY (thread_slug)"
+                    + "REFERENCES threads(slug) ON DELETE CASCADE"
                     + ")";
 
             //Create tables using statements from above

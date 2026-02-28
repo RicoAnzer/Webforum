@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import {
+  Route, Outlet, createBrowserRouter, RouterProvider, createRoutesFromElements
+} from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useError, DisplayErrorMessage } from './global-variables/ErrorMessage.jsx'
 import { useUser } from './global-variables/SignedInUser.jsx';
@@ -11,10 +13,13 @@ import {
 import {
   NameInput, PasswordInput, ConfirmPasswordInput, AddTopicInput
 } from "./components/popup.jsx";
+
 //Import external components
 import { Header } from './components/topicsList.jsx'
 import { ThreadList } from './pages/ThreadList.jsx';
 import { Thread } from './pages/Thread.jsx';
+import { threadLoader } from './components/threadLoaders.jsx'
+
 //Import CSS styles
 import './Styles/App.css'
 import './Styles/Popup.css';
@@ -25,7 +30,7 @@ function ErrorDisplay() {
   return errorMessage !== '' ? <DisplayErrorMessage /> : null;
 }
 
-function App() {
+function Main() {
   const intl = useIntl();
   const defaultError = intl.formatMessage({ id: "error.unexpected" });
 
@@ -152,62 +157,88 @@ function App() {
 
   return (
     <div className="main">
-      <BrowserRouter >
-        <Header></Header>
-        <div className='main-container'>
-          {/**Sign up popup */}
-          {signUpVisible &&
-            <div className="register-container popup register">
-              <h1 className='headline'><FormattedMessage id="forum.form.register" /></h1>
-              <form className="register-form" onSubmit={signUp}>
-                <NameInput />
-                <PasswordInput />
-                <ConfirmPasswordInput />
-                <ErrorDisplay />
-                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
-              </form>
+      <Header></Header>
+      <div className='main-container'>
+        {/**Sign up popup */}
+        {signUpVisible &&
+          <div className="register-container popup register">
+            <h1 className='headline'><FormattedMessage id="forum.form.register" /></h1>
+            <form className="register-form" onSubmit={signUp}>
+              <NameInput />
+              <PasswordInput />
+              <ConfirmPasswordInput />
+              <ErrorDisplay />
+              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+            </form>
 
-              <div className="hint">
-                <FormattedMessage id="forum.form.register.hint" /> <a href="/login"><FormattedMessage id="forum.form.login" /></a>
-              </div>
+            <div className="hint">
+              <FormattedMessage id="forum.form.register.hint" /> <a href="/login"><FormattedMessage id="forum.form.login" /></a>
             </div>
-          }
+          </div>
+        }
 
-          {/**Log in popup */}
-          {loginVisible &&
-            <div className="register-container popup login">
-              <h1 className='headline'><FormattedMessage id="forum.form.login" /></h1>
-              <form className="register-form" onSubmit={login}>
-                <NameInput />
-                <PasswordInput />
-                <ErrorDisplay />
-                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
-              </form>
+        {/**Log in popup */}
+        {loginVisible &&
+          <div className="register-container popup login">
+            <h1 className='headline'><FormattedMessage id="forum.form.login" /></h1>
+            <form className="register-form" onSubmit={login}>
+              <NameInput />
+              <PasswordInput />
+              <ErrorDisplay />
+              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+            </form>
 
-              <div className="hint">
-                <FormattedMessage id="forum.form.login.hint" /> <a href="/signup"><FormattedMessage id="forum.form.register" /></a>
-              </div>
+            <div className="hint">
+              <FormattedMessage id="forum.form.login.hint" /> <a href="/signup"><FormattedMessage id="forum.form.register" /></a>
             </div>
-          }
+          </div>
+        }
 
-          {/**Add topic popup */}
-          {addTopicVisible &&
-            <div className="register-container popup addTopic">
-              <h1 className='headline'><FormattedMessage id="forum.form.addTopic" /></h1>
-              <form className="register-form" onSubmit={addTopic}>
-                <AddTopicInput />
-                <ErrorDisplay />
-                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
-              </form>
-            </div>
-          }
-          <Routes >
-            <Route path=":topicId" element={<ThreadList />} />
-            <Route path=":topicId/:threadId" element={<Thread />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+        {/**Add topic popup */}
+        {addTopicVisible &&
+          <div className="register-container popup addTopic">
+            <h1 className='headline'><FormattedMessage id="forum.form.addTopic" /></h1>
+            <form className="register-form" onSubmit={addTopic}>
+              <AddTopicInput />
+              <ErrorDisplay />
+              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
+            </form>
+          </div>
+        }
+
+        <Outlet />
+      </div>
     </div>
+  )
+}
+
+//Create all routes
+const routes = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Main />}>
+      {/* Index Route oder Topic Liste */}
+      <Route
+        path=":topicSlug"
+        element={<ThreadList />}
+        loader={threadLoader}
+      />
+      <Route
+        path=":topicSlug/:threadSlug"
+        element={<Thread />}
+      />
+    </Route>
+  )
+);
+
+/**
+ * ------------------------------------------------------------------------------------------------------------
+ * Start of App
+ * ------------------------------------------------------------------------------------------------------------
+ */
+function App() {
+
+  return (
+    <RouterProvider router={routes} />
   )
 }
 export default App
