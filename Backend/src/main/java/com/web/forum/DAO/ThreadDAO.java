@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,35 +29,20 @@ public class ThreadDAO implements IThreadDAO {
 
     //Save a new Thread to database
     @Override
-    public Thread create(String name, String topicSlug) {
+    public Thread create(String topicSlug, Thread thread) {
         //SQL Statement to add new Threads to database
         String createSQL = "INSERT INTO threads (topic_slug, name, slug)"
                 + "VALUES (?, ?, ?)"
                 + "RETURNING id, topic_slug, name, slug;";
 
-        //Generate slug
-        //Remove all non ASCII Symbols like "@"
-        Pattern NON_ASCII = Pattern.compile("[^\\p{ASCII}]");
-        //Remove all characters but letters (a-z) and numbers
-        Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]+");
-        //Create slug out of name
-        //=> "This is a test name" to "this-is-a-test-name"
-        //1. Remove all accents (ä to a), 2. Remove all non ASCII Symbols like "@"
-        //3. All letters to lowerCase, 4. All characters but a-z and 0-9 to "-"
-        //5. Delete leading and ending "-"
-        String slug = Normalizer.normalize(name, Normalizer.Form.NFKD);
-        slug = NON_ASCII.matcher(slug).replaceAll("");
-        slug = NON_ALPHANUMERIC.matcher(slug.toLowerCase())
-                                      .replaceAll("-")
-                                      .replaceAll("^-|-$", "");
         Thread generatedThread = null;
 
         try (PreparedStatement statement = connection.prepareStatement(createSQL)) {
             //At creation of Thread 
             //=> id is automatically created inside database, doesn't need to be set here
             statement.setString(1, topicSlug);
-            statement.setString(2, name);
-            statement.setString(3, slug);
+            statement.setString(2, thread.getName());
+            statement.setString(3, thread.getSlug());
             statement.execute();
 
             //Return newly generated Thread

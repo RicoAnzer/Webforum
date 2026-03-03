@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,12 +25,16 @@ import com.web.forum.DAO.UserRoleDAO;
 import com.web.forum.Entity.Authentication.LoginCredentials;
 import com.web.forum.Entity.Authentication.RegistrationRequest;
 import com.web.forum.Entity.Role;
+import com.web.forum.Security.Error.CustomErrors.BadRequestError;
+import com.web.forum.Security.Error.CustomErrors.ConflictError;
+import com.web.forum.Security.Error.CustomErrors.NotFoundError;
+import com.web.forum.Security.Error.CustomErrors.UnauthorizedError;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-//UserService to manage Authentication of users
+//UserService to manage database traffic of Users (SignUp , login, get Users, etc...)
 @Service
 public class UserService implements UserDetailsService {
 
@@ -45,7 +47,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JwtService jwtService;
 
-    //Logger
+    // Logger
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Bean
@@ -53,130 +55,110 @@ public class UserService implements UserDetailsService {
         return new BCryptPasswordEncoder();
     }
 
-    //User login
+    // User login
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //Find User by username
+        // Find User by username
         LoginCredentials credentials = userDAO.readLoginCredentials(username);
-        //LoginCredentials == null => No User with this username, throw error
+        // LoginCredentials == null => No User with this username, throw error
         if (credentials == null) {
             throw new UsernameNotFoundException("User not found with this name: " + username);
         }
-        //List all roles
+        // List all roles
         List<String> roles = userRoleDAO.readById(credentials.getUserId());
 
-        //Create userdetails
+        // Create userdetails
         UserDetails user = User
                 .withUsername(credentials.getUsername())
                 .password(credentials.getPassword())
                 .roles(roles.toArray(String[]::new))
                 .build();
-        //Return UserDetails
+        // Return UserDetails
         return user;
     }
 
-    //Register new user
-    public ResponseEntity<?> registerNewUser(RegistrationRequest request) {
+    // Register new user
+    public LoginCredentials registerNewUser(RegistrationRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
-        String confirmedPassword = request.getConfirmedPassword();
+        
+        // Check if username already exists (if it doesn't exist: readName() == null)
+        if (userDAO.readName(username) == null) {
+            // Encode password
+            String encodedPassword = passwordEncoder().encode(password);
+            // Format createdAt to "dd-MM-YYYY"
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            // Id null to auto generate id at database
+            Long id = null;
 
-        //If username is empty => error
-        if ("".equals(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is empty");
-        }
-        //If username is too long => error
-        if (username.length() > 20) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose an username with less than 20 characters");
-        }
-        //Compare password and confirmPassword values
-        if (password.equals(confirmedPassword)) {
-            //If username is empty => error
-            if ("".equals(password)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose a password");
-            }
+            // Empty roles List as placeholder
+            // => Roles List shows all roles assigned to user for later use in Frontend
+            // (E.g. Only Moderators can add Topics, so Button to add them is invisible for
+            // common users)
+            // => User and Roles getting assigned in later step in table user_roles
+            List<String> roles = new ArrayList<>();
 
-            //Check if username already exists (if it doesn't exist: findByName() == null)
-            if (userDAO.readName(username) == null) {
-                //Encode password
-                String encodedPassword = passwordEncoder().encode(password);
-                //Format createdAt to "dd-MM-YYYY"
-                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                //Id null to auto generate id at database
-                Long id = null;
+            // Create User Object
+            com.web.forum.Entity.User newUser = new com.web.forum.Entity.User(
+                    id,
+                    username,
+                    roles,
+                    "",
+                    LocalDate.now().format(dateTimeFormatter),
+                    "",
+                    false);
 
-                //Empty roles List as placeholder 
-                //=> Roles List shows all roles assigned to user for later use in Frontend 
-                //(E.g. Only Moderators can add Topics, so Button to add them is invisible for common users)
-                //=> User and Roles getting assigned in later step in table user_roles
-                List<String> roles = new ArrayList<>();
-
-                //Create User Object
-                com.web.forum.Entity.User newUser = new com.web.forum.Entity.User(
-                        id,
-                        username,
-                        roles,
-                        "",
-                        LocalDate.now().format(dateTimeFormatter),
-                        "",
-                        false
-                );
-
-                //Save newUser to database and autogenerate ID
-                LoginCredentials credentials = userDAO.create(newUser, encodedPassword);
-                //Bind Role 'USER' to created user in table user_roles
-                try {
-                    //Extract Role "USER"
-                    //=> 1 = USER
-                    if (credentials != null) {
-                        Role role = roleDAO.read(1);
-                        //Bind Role "USER" to user
-                        userRoleDAO.create(credentials.getUserId(), role.getId());
-                    }
-                } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't bind User to Role");
+            // Save newUser to database and autogenerate ID
+            LoginCredentials credentials = userDAO.create(newUser, encodedPassword);
+            // Bind Role 'USER' to created user in table user_roles
+            try {
+                // Extract Role "USER"
+                // => 1 = USER
+                if (credentials != null) {
+                    Role role = roleDAO.read(1);
+                    // Bind Role "USER" to user
+                    userRoleDAO.create(credentials.getUserId(), role.getId());
                 }
-
-                return ResponseEntity.status(HttpStatus.CREATED).body(credentials);
-
-            } else {
-                //If name already in database => error
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+            } catch (Exception e) {
+                throw new ConflictError("Can't bind User to Role");
             }
+
+            return credentials;
 
         } else {
-            //If not matching => error
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password and confirmedPassword don't match");
+            // If name already in database => error
+            throw new BadRequestError("Username already exists");
         }
     }
 
-    //Login as user
-    public ResponseEntity<?> userLogin(@RequestBody LoginCredentials loginCredentials, HttpServletRequest request, HttpServletResponse response) {
-        //Expiry interval for cookie = 1 Day in Milliseconds
-        int expiryInterval = 24 * 60 * 60 * 1000;
-        //Load user Object from database
+    // Login as user
+    public com.web.forum.Entity.User userLogin(@RequestBody LoginCredentials loginCredentials,
+            HttpServletRequest request, HttpServletResponse response) {
+        // Load user Object from database
         com.web.forum.Entity.User loggedInUser = userDAO.readName(loginCredentials.getUsername());
-
-        //If user doesn't exist in database => error
+        // If user doesn't exist in database => error
         if (loggedInUser == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            throw new BadRequestError("User not found");
         }
-        //If user is already logged in => error
+        // If user is already logged in => error
         if (jwtService.isLoggedIn(request)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already logged in");
+            throw new ConflictError("User is already logged in");
         }
-        //If password is wrong => error
+        // If password is wrong => error
         String encryptedPassword = userDAO.readLoginCredentials(loginCredentials.getUsername()).getPassword();
         if (!passwordEncoder().matches(loginCredentials.getPassword(), encryptedPassword)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password not found");
+            throw new BadRequestError("Password not found");
         }
 
-        //If username and password are correct => generate jwt token
+        // Expiry interval for cookie = 1 Day in Milliseconds
+        int expiryInterval = 24 * 60 * 60 * 1000;
+        // If username and password are correct => generate jwt token
         String token = jwtService.generateToken(loginCredentials.getUsername(), expiryInterval);
+
         log.info("Log in success: " + loginCredentials.getUsername());
-        //Send JWT token in an HTTP-Only cookie
-        ResponseCookie cookie = ResponseCookie.
-                from("jwtToken", token)
+
+        // Send JWT token in an HTTP-Only cookie
+        ResponseCookie cookie = ResponseCookie.from("jwtToken", token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -185,23 +167,22 @@ public class UserService implements UserDetailsService {
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
 
-        // Return success response and user Object for frontend processing
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(loggedInUser);
+        return loggedInUser;
     }
 
-    //Logout user by deleting jwt token
-    public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+    // Logout user by deleting jwt token
+    public String logoutUser(HttpServletRequest request, HttpServletResponse response) {
         // Check for jwt token in cookies
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwtToken".equals(cookie.getName())) {
-                    //Extract jwt token
+                    // Extract jwt token
                     String jwtToken = cookie.getValue();
-                    //Validate jwt token and delete if validated
+                    // Validate jwt token and delete if validated
                     if (jwtToken != null
                             || !jwtService.isTokenExpired(jwtToken)
-                            && userDAO.readName(jwtService.getUserName(jwtToken)) != null) {
-                        //Create new cookie with same name and maxAge to 0 => delete Cookie
+                                    && userDAO.readName(jwtService.getUserName(jwtToken)) != null) {
+                        // Create new cookie with same name and maxAge to 0 => delete Cookie
                         ResponseCookie newCookie = ResponseCookie.from("jwtToken", "")
                                 .httpOnly(true)
                                 .secure(true)
@@ -211,12 +192,39 @@ public class UserService implements UserDetailsService {
                                 .build();
                         response.addHeader("Set-Cookie", newCookie.toString());
                         log.info("Log out success: " + jwtService.getUserName(jwtToken));
-                        return ResponseEntity.status(HttpStatus.OK).body("Logged out succesfully");
+                        return "Logged out succesfully";
                     }
                 }
             }
         }
-        //No token found => Not logged in
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        // No token found => Not logged in
+        throw new UnauthorizedError("Not logged in");
+    }
+
+    //Return an User by username
+    public com.web.forum.Entity.User getUserByName(String username) {
+        com.web.forum.Entity.User user = userDAO.readName(username);
+        if (user == null) {
+            throw new NotFoundError("User '" + username + "' not found");
+        }
+        return user;
+    }
+
+    //Update user
+    public com.web.forum.Entity.User updateUser(String oldName, com.web.forum.Entity.User newUser) {
+        com.web.forum.Entity.User user = userDAO.readName(oldName);
+        if (user == null) {
+            throw new NotFoundError("User '" + oldName + "' not found");
+        }
+        if (userDAO.readName(newUser.getName()) != null) {
+            throw new ConflictError("An User with this name already exists");
+
+        }
+        return userDAO.update(newUser);
+    }
+
+    //Delete an User by username
+    public String deleteUser(String username) {
+        return userDAO.delete(username);
     }
 }

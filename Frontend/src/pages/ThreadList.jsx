@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Link, useLoaderData, useRevalidator } from 'react-router-dom';
+import { Link, useLoaderData, useParams, useRevalidator } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useError, DisplayErrorMessage } from '../global-variables/ErrorMessage.jsx';
 import { useAddThreadInput, useAddThreadVisible } from '../global-variables/PopupData.jsx';
@@ -42,18 +42,19 @@ const DisplayThreads = ({ threadList }) => {
 
 /**Displaying Threads of current Topic*/
 export const ThreadList = () => {
-    //Load data of threadLoader
-    const { topicSlug, threads } = useLoaderData()
+    //Get data of url
+    const { topicSlug } = useParams();
+    //Load data of threadLoader => List of all Threads
+    const threads = useLoaderData();
+
     const revalidator = useRevalidator();
-
     const intl = useIntl();
-    const defaultError = intl.formatMessage({ id: "error.unexpected" });
 
+    const defaultError = intl.formatMessage({ id: "error.unexpected" });
     const { setErrorMessage } = useError()
 
     const { addThreadInput, setAddThreadInput } = useAddThreadInput();
     const { addThreadVisible, setAddThreadVisible } = useAddThreadVisible()
-
 
     async function addThread(event) {
         try {

@@ -27,8 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.web.forum.DAO.UserDAO;
+import com.web.forum.Entity.Authentication.RegistrationRequest;
 import com.web.forum.Entity.User;
+import com.web.forum.Service.UserService;
 
 //Integration tests for UserController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
@@ -41,27 +42,24 @@ class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    public UserDAO userDAO;
+    private UserService userService;
 
     String newName = "";
-    User mockUser = null;
-    User mockUser2 = null;
+    RegistrationRequest mockUser = null;
+    RegistrationRequest mockUser2 = null;
 
     private static final Logger log = LoggerFactory.getLogger(UserControllerTests.class);
 
     @BeforeAll
     public void setUp() {
         log.info("Start UserControllerTests...");
-        List<String> roles = new ArrayList<>(Arrays.asList("USER"));
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String date = LocalDate.now().format(dateTimeFormatter);
         //Create mocked user
-        mockUser = new User(null, "Herbert1234", roles, "", date, "", false);
-        userDAO.create(mockUser, "1234");
+        mockUser = new RegistrationRequest("Herbert1234", "1234", "1234");
+        mockUser2 = new RegistrationRequest("Franz1234", "1234", "1234");
+        userService.registerNewUser(mockUser);
+        userService.registerNewUser(mockUser2);
         //New name of mockUser for testing updateUserWhenExists()
         newName = "Herbert4321";
-        mockUser2 = new User(null, "Franz1234", roles, "", date, "", false);
-        userDAO.create(mockUser2, "1234");
     }
 
     @AfterAll
@@ -75,14 +73,14 @@ class UserControllerTests {
     @Test
     public void getUserWhenExists() throws Exception {
         log.info("Testing getUserWhenExists()...");
-        RequestBuilder request = MockMvcRequestBuilders.get("/user/get/{username}", mockUser.getName())
+        RequestBuilder request = MockMvcRequestBuilders.get("/user/get/{username}", mockUser.getUsername())
                 .contentType(MediaType.APPLICATION_JSON);
 
         //Expect Status Ok and check returned name
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(mockUser.getName()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(mockUser.getUsername()));
     }
 
     //Test getUser when searched User doesn't exist
@@ -92,13 +90,14 @@ class UserControllerTests {
     public void getUserWhenNotExists() throws Exception {
         log.info("Testing getUserWhenNotExists()...");
         String username = "Alice4321";
+        String errorMessage = "User '" + username + "' not found";
         RequestBuilder request = MockMvcRequestBuilders.get("/user/get/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON);
 
-        //Expect Status BadRequest and error message
+        //Expect Status NotFound and error message
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User '" + username + "' not found"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
     //Test updateUser when updated user exists
@@ -111,14 +110,14 @@ class UserControllerTests {
             List<String> roles = new ArrayList<>(Arrays.asList("USER"));
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             String date = LocalDate.now().format(dateTimeFormatter);
-            User oldUser = userDAO.readName(mockUser.getName());
+            User oldUser = userService.getUserByName(mockUser.getUsername());
             User updatedUser = new User(oldUser.getId(), newName, roles, "null", date, "", false);
 
             //UpdatedUser object as json
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(updatedUser);
 
-            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", mockUser.getName())
+            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", oldUser.getName())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
@@ -141,7 +140,8 @@ class UserControllerTests {
         log.info("Testing updateUserWhenNotExists()...");
         try {
             String username = "Peter1234";
-            User updatedUser = new User(mockUser.getId(), username, null, null, null, null, false);
+            User mockedUser = userService.getUserByName(mockUser.getUsername());
+            User updatedUser = new User(mockedUser.getId(), username, null, null, null, null, false);
             String errorMessage = "User '" + username + "' not found";
 
             //UpdatedUser object as json
@@ -155,7 +155,7 @@ class UserControllerTests {
             //Expect Status Ok and check name of updated user
             mockMvc.perform(request)
                     .andExpect(status().isNotFound())
-                    .andExpect(content().string(errorMessage));
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
 
         } catch (Exception ex) {
             log.error(ex.toString());
@@ -171,21 +171,21 @@ class UserControllerTests {
         try {
             //mockUser2 (Franz) tries to rename his account to the new name of mockUser (Herbert)
             //Get Herbert
-            User updatedUser = userDAO.readName(newName);
+            User updatedUser = userService.getUserByName(newName);
             String errorMessage = "An User with this name already exists";
 
             //UpdatedUser object as json
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(updatedUser);
 
-            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", mockUser2.getName())
+            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", mockUser2.getUsername())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
             //Expect Status Ok and check name of updated user
             mockMvc.perform(request)
                     .andExpect(status().isConflict())
-                    .andExpect(content().string(errorMessage));
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
 
         } catch (Exception ex) {
             log.error(ex.toString());
@@ -198,25 +198,25 @@ class UserControllerTests {
     @Test
     public void deleteUser() throws Exception {
         log.info("Testing deleteUser()...");
-        String errorMessage1 = "Deleted User '" + newName + "'";
-        String errorMessage2 = "Deleted User '" + mockUser2.getName() + "'";
+        String deleteMessage1 = "Deleted User '" + newName + "'";
+        String deleteMessage2 = "Deleted User '" + mockUser2.getUsername() + "'";
 
         //Delete Herbert using his new name after updating
         RequestBuilder request1 = MockMvcRequestBuilders.delete("/user/delete/{username}", newName)
                 .contentType(MediaType.APPLICATION_JSON);
         //Delete Franz
-        RequestBuilder request2 = MockMvcRequestBuilders.delete("/user/delete/{username}", mockUser2.getName())
+        RequestBuilder request2 = MockMvcRequestBuilders.delete("/user/delete/{username}", mockUser2.getUsername())
                 .contentType(MediaType.APPLICATION_JSON);
 
         //Delete Herbert and Franz created in setUp()
         //Expect Status Ok and "Deleted" message
         mockMvc.perform(request1)
                 .andExpect(status().isOk())
-                .andExpect(content().string(errorMessage1));
+                .andExpect(content().string(deleteMessage1));
 
         //Expect Status Ok and "Deleted" message
         mockMvc.perform(request2)
                 .andExpect(status().isOk())
-                .andExpect(content().string(errorMessage2));
+                .andExpect(content().string(deleteMessage2));
     }
 }

@@ -22,8 +22,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.web.forum.DAO.TopicDAO;
 import com.web.forum.Entity.Topic;
+import com.web.forum.Service.TopicService;
 
 //Integration tests for TopicController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
@@ -36,22 +36,22 @@ public class TopicControllerTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    public TopicDAO topicDAO;
+    private TopicService topicService;
 
     private static final Logger log = LoggerFactory.getLogger(TopicControllerTests.class);
 
     @BeforeAll
     public void setUp() {
         log.info("Start TopicControllerTests...");
-        topicDAO.create("First Topic");
-        topicDAO.create("Second Topic");
+        topicService.createNewTopic("First Topic");
+        topicService.createNewTopic("Second Topic");
     }
 
     @AfterAll
     public void cleanUp() {
         log.info("End TopicControllerTests...");
-        topicDAO.delete("First Topic");
-        topicDAO.delete("Second Topic");
+        topicService.deleteTopic("First Topic");
+        topicService.deleteTopic("Second Topic");
     }
 
     //Test addTopic when successful
@@ -87,7 +87,7 @@ public class TopicControllerTests {
         //Expect Status Conflict and check created message
         mockMvc.perform(request)
                 .andExpect(status().isConflict())
-                .andExpect(content().string(errorMessage));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
     //Test getAllTopics when Topics exist
@@ -110,7 +110,7 @@ public class TopicControllerTests {
     @Test
     public void getTopicWhenExists() throws Exception {
         log.info("Testing getTopicWhenExists()...");
-        List<Topic> topics = topicDAO.readAll();
+        List<Topic> topics = topicService.getAllTopics();
 
         RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", topics.get(0).getId())
                 .contentType(MediaType.APPLICATION_JSON);
@@ -135,7 +135,7 @@ public class TopicControllerTests {
         //Expect Status NotFOund and check errorMessage
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(errorMessage));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
     //Test deleteTopic

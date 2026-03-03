@@ -22,10 +22,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.web.forum.DAO.ThreadDAO;
-import com.web.forum.DAO.TopicDAO;
 import com.web.forum.Entity.Thread;
 import com.web.forum.Entity.Topic;
+import com.web.forum.Service.ThreadService;
+import com.web.forum.Service.TopicService;
 
 //Integration tests for ThreadController
 //APPLICATION MUST RUN FOR TESTS TO BE SUCCESSFUL
@@ -38,35 +38,29 @@ public class ThreadControllerTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    public ThreadDAO threadDAO;
+    private ThreadService threadService;
     @Autowired
-    public TopicDAO topicDAO;
+    private TopicService topicService;
 
-    private Topic mockTopic = null;
+    private Topic mockTopic;
 
     private static final Logger log = LoggerFactory.getLogger(ThreadControllerTests.class);
 
     @BeforeAll
     public void setUp() {
         log.info("Start ThreadControllerTests...");
-        if (topicDAO.readbyName("First Test Topic") == null) {
-            topicDAO.create("First Test Topic");
-        }
-        mockTopic = topicDAO.readbyName("First Test Topic");
-        if (threadDAO.readByName("First Thread") == null) {
-            threadDAO.create("First Thread", mockTopic.getSlug());
-        }
-        if (threadDAO.readByName("Second Thread") == null) {
-            threadDAO.create("Second Thread", mockTopic.getSlug());
-        }
+
+        mockTopic = topicService.createNewTopic("First Test Topic");
+        threadService.createNewThread(mockTopic.getSlug(), "First Thread");
+        threadService.createNewThread(mockTopic.getSlug(), "Second Thread");
     }
 
     @AfterAll
     public void cleanUp() {
         log.info("End ThreadControllerTests...");
-        threadDAO.delete("First Thread");
-        threadDAO.delete("Second Thread");
-        topicDAO.delete("First Test Topic");
+        threadService.deleteThread(mockTopic.getName());
+        threadService.deleteThread("Second Thread");
+        topicService.deleteTopic("First Test Topic");
     }
 
     //Test addThread when successful
@@ -103,7 +97,7 @@ public class ThreadControllerTests {
         //Expect Status Conflict and check created message
         mockMvc.perform(request)
                 .andExpect(status().isConflict())
-                .andExpect(content().string(errorMessage));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
     //Test getAllThreads when Threads exist
@@ -126,7 +120,7 @@ public class ThreadControllerTests {
     @Test
     public void getThreadWhenExists() throws Exception {
         log.info("Testing getThreadWhenExists()...");
-        List<Thread> threads = threadDAO.readAll(mockTopic.getSlug());
+        List<Thread> threads = threadService.getAllThreads(mockTopic.getSlug());
         RequestBuilder request = MockMvcRequestBuilders.get("/thread/get/{threadName}", threads.get(0).getName())
                 .contentType(MediaType.APPLICATION_JSON);
         //Expect Status Ok and check returned name
@@ -149,7 +143,7 @@ public class ThreadControllerTests {
         //Expect Status NotFound and check errorMessage
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(errorMessage));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
     //Test deleteThread

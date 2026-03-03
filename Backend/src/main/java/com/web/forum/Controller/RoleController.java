@@ -9,28 +9,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.web.forum.DAO.RoleDAO;
+import com.web.forum.Service.RoleService;
 
 @RestController
 @RequestMapping("/role")
 public class RoleController {
 
     @Autowired
-    private RoleDAO roleDAO;
+    private RoleService roleService;
 
     //Add new Role
     @PostMapping("/add/{roleName}")
     public ResponseEntity<?> addRole(@PathVariable String roleName) {
-        if (roleDAO.readByName(roleName) != null) {
-             return ResponseEntity.status(HttpStatus.CONFLICT).body("Role with this name already exists");
-        }
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(roleDAO.create(roleName));
+        return ResponseEntity.status(HttpStatus.CREATED).body(roleService.createRole(roleName));
     }
 
     //Delete existing Role
     @DeleteMapping("/delete/{roleName}")
     public ResponseEntity<?> deleteRole(@PathVariable String roleName) {
-        return ResponseEntity.status(HttpStatus.OK).body(roleDAO.delete(roleName));
+        return ResponseEntity.status(HttpStatus.OK).body(roleService.deleteRole(roleName));
     }
 }
