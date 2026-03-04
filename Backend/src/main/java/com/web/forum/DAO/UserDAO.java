@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.web.forum.DAO.Interfaces.IUserDAO;
@@ -19,14 +18,14 @@ import com.web.forum.ForumApplication;
 @Repository
 public class UserDAO implements IUserDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(UserDAO.class);
     private final Connection connection;
+    private final UserRoleDAO userRoleDAO;
 
-    @Autowired
-    private UserRoleDAO userRoleDAO;
+    private static final Logger log = LoggerFactory.getLogger(UserDAO.class);
 
     //Constructor
-    public UserDAO(ForumApplication forumApplication) {
+    public UserDAO(UserRoleDAO userRoleDAO, ForumApplication forumApplication) {
+        this.userRoleDAO = userRoleDAO;
         //Connect to database;
         this.connection = forumApplication.connection;
     }
@@ -128,7 +127,7 @@ public class UserDAO implements IUserDAO {
 
     //Update existing User based on id
     @Override
-    public User update(User user) {
+    public User update(User updatedUser) {
         //To change User:
         //=> User Object = Object containing changed settings
         //=> Fields id, profileImagePath and createdAt are unchangeable
@@ -137,15 +136,15 @@ public class UserDAO implements IUserDAO {
                 + "WHERE id = ?;";
         //Execute statement
         try (PreparedStatement statement = connection.prepareStatement(updateSQL)) {
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getDeletedAt());
-            statement.setBoolean(3, user.getIsBanned());
-            statement.setLong(4, user.getId());
+            statement.setString(1, updatedUser.getName());
+            statement.setString(2, updatedUser.getDeletedAt());
+            statement.setBoolean(3, updatedUser.getIsBanned());
+            statement.setLong(4, updatedUser.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return user;
+        return updatedUser;
     }
 
     //Delete existing Topic based on id

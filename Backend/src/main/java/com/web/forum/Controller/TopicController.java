@@ -1,6 +1,5 @@
 package com.web.forum.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +16,11 @@ import com.web.forum.Service.TopicService;
 @RequestMapping("/topic")
 public class TopicController {
 
-    @Autowired
-    private TopicService topicService;
+    private final TopicService topicService;
+
+    public TopicController(TopicService topicService) {
+        this.topicService = topicService;
+    }
 
     //Add a new Topic
     @PostMapping(value = {"/add/{name}", "/add/"})

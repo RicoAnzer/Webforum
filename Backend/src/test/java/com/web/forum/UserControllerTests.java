@@ -39,20 +39,25 @@ import com.web.forum.Service.UserService;
 @AutoConfigureMockMvc(addFilters = true)
 class UserControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private UserService userService;
+    private final MockMvc mockMvc;
+    private final UserService userService;
 
-    String newName = "";
-    RegistrationRequest mockUser = null;
-    RegistrationRequest mockUser2 = null;
+    private String newName;
+    private RegistrationRequest mockUser;
+    private RegistrationRequest mockUser2;
 
     private static final Logger log = LoggerFactory.getLogger(UserControllerTests.class);
+
+    @Autowired
+    public UserControllerTests(MockMvc mockMvc, UserService userService) {
+        this.mockMvc = mockMvc;
+        this.userService = userService;
+    }
 
     @BeforeAll
     public void setUp() {
         log.info("Start UserControllerTests...");
+
         //Create mocked user
         mockUser = new RegistrationRequest("Herbert1234", "1234", "1234");
         mockUser2 = new RegistrationRequest("Franz1234", "1234", "1234");

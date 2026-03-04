@@ -1,6 +1,5 @@
 package com.web.forum.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +19,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/auth")
 public class SignUpController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public SignUpController(UserService userService) {
+        this.userService = userService;
+    }
 
     // Register user
     @PostMapping("/register")

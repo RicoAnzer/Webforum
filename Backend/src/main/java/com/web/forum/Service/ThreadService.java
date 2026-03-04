@@ -4,7 +4,6 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.web.forum.DAO.ThreadDAO;
@@ -12,12 +11,15 @@ import com.web.forum.Entity.Thread;
 import com.web.forum.Security.Error.CustomErrors.ConflictError;
 import com.web.forum.Security.Error.CustomErrors.NotFoundError;
 
-//ThreadService to manage database traffic of Threads
+//ThreadService to manage database traffic of Threads (create, delete, etc.)
 @Service
 public class ThreadService {
 
-    @Autowired
-    private ThreadDAO threadDAO;
+    private final ThreadDAO threadDAO;
+
+    public ThreadService(ThreadDAO threadDAO) {
+        this.threadDAO = threadDAO;
+    }
 
     //Save a new Thread to database
     public Thread createNewThread(String threadSlug, String name) {

@@ -35,133 +35,141 @@ import com.web.forum.Service.TopicService;
 @AutoConfigureMockMvc(addFilters = true)
 public class ThreadControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ThreadService threadService;
-    @Autowired
-    private TopicService topicService;
+        private final MockMvc mockMvc;
+        private final ThreadService threadService;
+        private final TopicService topicService;
 
-    private Topic mockTopic;
+        private Topic mockTopic;
 
-    private static final Logger log = LoggerFactory.getLogger(ThreadControllerTests.class);
+        private static final Logger log = LoggerFactory.getLogger(ThreadControllerTests.class);
 
-    @BeforeAll
-    public void setUp() {
-        log.info("Start ThreadControllerTests...");
+        @Autowired
+        public ThreadControllerTests(MockMvc mockMvc, ThreadService threadService, TopicService topicService) {
+                this.mockMvc = mockMvc;
+                this.threadService = threadService;
+                this.topicService = topicService;
+        }
 
-        mockTopic = topicService.createNewTopic("First Test Topic");
-        threadService.createNewThread(mockTopic.getSlug(), "First Thread");
-        threadService.createNewThread(mockTopic.getSlug(), "Second Thread");
-    }
+        @BeforeAll
+        public void setUp() {
+                log.info("Start ThreadControllerTests...");
 
-    @AfterAll
-    public void cleanUp() {
-        log.info("End ThreadControllerTests...");
-        threadService.deleteThread(mockTopic.getName());
-        threadService.deleteThread("Second Thread");
-        topicService.deleteTopic("First Test Topic");
-    }
+                mockTopic = topicService.createNewTopic("First Test Topic");
+                threadService.createNewThread(mockTopic.getSlug(), "First Thread");
+                threadService.createNewThread(mockTopic.getSlug(), "Second Thread");
+        }
 
-    //Test addThread when successful
-    @SuppressWarnings("null")
-    @Order(1)
-    @Test
-    public void addThread() throws Exception {
-        log.info("Testing addThread()...");
-        String threadName = "ThirdThread";
+        @AfterAll
+        public void cleanUp() {
+                log.info("End ThreadControllerTests...");
+                threadService.deleteThread(mockTopic.getName());
+                threadService.deleteThread("Second Thread");
+                topicService.deleteTopic("First Test Topic");
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test addThread when successful
+        @SuppressWarnings("null")
+        @Order(1)
+        @Test
+        public void addThread() throws Exception {
+                log.info("Testing addThread()...");
+                String threadName = "ThirdThread";
 
-        //Expect Status Created and check created message
-        mockMvc.perform(request)
-                .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(threadName))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.topicSlug").value(mockTopic.getSlug()));
-    }
+                RequestBuilder request = MockMvcRequestBuilders
+                                .post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test addThread when Thread already exists
-    @SuppressWarnings("null")
-    @Order(2)
-    @Test
-    public void addThreadWhenExists() throws Exception {
-        log.info("Testing addThreadWhenExists()...");
-        String threadName = "ThirdThread";
-        String errorMessage = "Thread with this name already exists";
+                // Expect Status Created and check created message
+                mockMvc.perform(request)
+                                .andExpect(status().isCreated())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(threadName))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.topicSlug").value(mockTopic.getSlug()));
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test addThread when Thread already exists
+        @SuppressWarnings("null")
+        @Order(2)
+        @Test
+        public void addThreadWhenExists() throws Exception {
+                log.info("Testing addThreadWhenExists()...");
+                String threadName = "ThirdThread";
+                String errorMessage = "Thread with this name already exists";
 
-        //Expect Status Conflict and check created message
-        mockMvc.perform(request)
-                .andExpect(status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
-    }
+                RequestBuilder request = MockMvcRequestBuilders
+                                .post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test getAllThreads when Threads exist
-    @SuppressWarnings("null")
-    @Order(3)
-    @Test
-    public void getAllThreads() throws Exception {
-        log.info("Testing getAllThreads()...");
-        RequestBuilder request = MockMvcRequestBuilders.get("/thread/getAll/{topicSlug}", mockTopic.getSlug())
-                .contentType(MediaType.APPLICATION_JSON);
+                // Expect Status Conflict and check created message
+                mockMvc.perform(request)
+                                .andExpect(status().isConflict())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
+        }
 
-        //Expect Status Ok and check returned ids
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-    }
+        // Test getAllThreads when Threads exist
+        @SuppressWarnings("null")
+        @Order(3)
+        @Test
+        public void getAllThreads() throws Exception {
+                log.info("Testing getAllThreads()...");
+                RequestBuilder request = MockMvcRequestBuilders.get("/thread/getAll/{topicSlug}", mockTopic.getSlug())
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test getThread when Thread exist
-    @SuppressWarnings("null")
-    @Order(4)
-    @Test
-    public void getThreadWhenExists() throws Exception {
-        log.info("Testing getThreadWhenExists()...");
-        List<Thread> threads = threadService.getAllThreads(mockTopic.getSlug());
-        RequestBuilder request = MockMvcRequestBuilders.get("/thread/get/{threadName}", threads.get(0).getName())
-                .contentType(MediaType.APPLICATION_JSON);
-        //Expect Status Ok and check returned name
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(threads.get(0).getName()));
-    }
+                // Expect Status Ok and check returned ids
+                mockMvc.perform(request)
+                                .andExpect(status().isOk());
+        }
 
-    //Test getThread when Thread doesn't exist
-    @SuppressWarnings("null")
-    @Order(5)
-    @Test
-    public void getThreadWhenNotExists() throws Exception {
-        log.info("Testing getThreadWhenNotExists()...");
-        String errorMessage = "No Thread found";
-        RequestBuilder request = MockMvcRequestBuilders.get("/thread/get/{threadName}", "Non existent Thread name")
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test getThread when Thread exist
+        @SuppressWarnings("null")
+        @Order(4)
+        @Test
+        public void getThreadWhenExists() throws Exception {
+                log.info("Testing getThreadWhenExists()...");
+                List<Thread> threads = threadService.getAllThreads(mockTopic.getSlug());
+                RequestBuilder request = MockMvcRequestBuilders
+                                .get("/thread/get/{threadName}", threads.get(0).getName())
+                                .contentType(MediaType.APPLICATION_JSON);
+                // Expect Status Ok and check returned name
+                mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(threads.get(0).getName()));
+        }
 
-        //Expect Status NotFound and check errorMessage
-        mockMvc.perform(request)
-                .andExpect(status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
-    }
+        // Test getThread when Thread doesn't exist
+        @SuppressWarnings("null")
+        @Order(5)
+        @Test
+        public void getThreadWhenNotExists() throws Exception {
+                log.info("Testing getThreadWhenNotExists()...");
+                String errorMessage = "No Thread found";
+                RequestBuilder request = MockMvcRequestBuilders
+                                .get("/thread/get/{threadName}", "Non existent Thread name")
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test deleteThread
-    @SuppressWarnings("null")
-    @Order(6)
-    @Test
-    public void deleteThread() throws Exception {
-        log.info("Testing deleteThread()...");
-        //Delete Topic created in Test addTopic()
-        String threadName = "ThirdThread";
-        String deleteMessage = "Thread deleted";
+                // Expect Status NotFound and check errorMessage
+                mockMvc.perform(request)
+                                .andExpect(status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.delete("/thread/delete/{threadName}", threadName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test deleteThread
+        @SuppressWarnings("null")
+        @Order(6)
+        @Test
+        public void deleteThread() throws Exception {
+                log.info("Testing deleteThread()...");
+                // Delete Topic created in Test addTopic()
+                String threadName = "ThirdThread";
+                String deleteMessage = "Thread deleted";
 
-        //Expect Status Ok and "Deleted" message
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().string(deleteMessage));
-    }
+                RequestBuilder request = MockMvcRequestBuilders.delete("/thread/delete/{threadName}", threadName)
+                                .contentType(MediaType.APPLICATION_JSON);
+
+                // Expect Status Ok and "Deleted" message
+                mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andExpect(content().string(deleteMessage));
+        }
 }

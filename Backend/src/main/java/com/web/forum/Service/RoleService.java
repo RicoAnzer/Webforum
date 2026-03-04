@@ -1,16 +1,19 @@
 package com.web.forum.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.web.forum.DAO.RoleDAO;
 import com.web.forum.Security.Error.CustomErrors.ConflictError;
 
+//RoleService to manage database traffic of Roles (create, delete)
 @Service
 public class RoleService {
 
-    @Autowired
-    private RoleDAO roleDAO;
+    private final RoleDAO roleDAO;
+
+    public RoleService(RoleDAO roleDAO) {
+        this.roleDAO = roleDAO;
+    }
 
     public String createRole(String roleName){
         if (roleDAO.readByName(roleName) != null) {

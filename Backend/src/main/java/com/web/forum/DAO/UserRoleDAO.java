@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -21,14 +20,14 @@ import com.web.forum.ForumApplication;
 @Repository
 public class UserRoleDAO implements IUserRoleDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(UserRoleDAO.class);
     private final Connection connection;
-
-    @Autowired
-    private RoleDAO roleDAO;
+    private final RoleDAO roleDAO;
+    
+    private static final Logger log = LoggerFactory.getLogger(UserRoleDAO.class);
 
     //Constructor
-    public UserRoleDAO(ForumApplication forumApplication) {
+    public UserRoleDAO(RoleDAO roleDAO, ForumApplication forumApplication) {
+        this.roleDAO = roleDAO;
         //Connect to database;
         this.connection = forumApplication.connection;
     }

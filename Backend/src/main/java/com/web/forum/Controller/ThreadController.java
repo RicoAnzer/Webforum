@@ -1,6 +1,5 @@
 package com.web.forum.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +16,11 @@ import com.web.forum.Service.ThreadService;
 @RequestMapping("/thread")
 public class ThreadController {
 
-    @Autowired
-    private ThreadService threadService;
+    private final ThreadService threadService;
+
+    public ThreadController(ThreadService threadService) {
+        this.threadService = threadService;
+    }
 
     //Add a new Thread
     @PostMapping(value = {"/add/{topicSlug}/{threadName}", "/add/{topicSlug}/"})

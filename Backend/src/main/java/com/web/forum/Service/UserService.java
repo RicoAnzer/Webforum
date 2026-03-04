@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.User;
@@ -38,17 +37,20 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserDAO userDAO;
-    @Autowired
-    private UserRoleDAO userRoleDAO;
-    @Autowired
-    private RoleDAO roleDAO;
-    @Autowired
-    private JwtService jwtService;
+    private final UserDAO userDAO;
+    private final UserRoleDAO userRoleDAO;
+    private final RoleDAO roleDAO;
+    private final JwtService jwtService;
 
     // Logger
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+
+    public UserService(UserDAO userDAO, UserRoleDAO userRoleDAO, RoleDAO roleDAO, JwtService jwtService) {
+        this.userDAO = userDAO;
+        this.userRoleDAO = userRoleDAO;
+        this.roleDAO = roleDAO;
+        this.jwtService = jwtService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -211,16 +213,18 @@ public class UserService implements UserDetailsService {
     }
 
     //Update user
-    public com.web.forum.Entity.User updateUser(String oldName, com.web.forum.Entity.User newUser) {
+    public com.web.forum.Entity.User updateUser(String oldName, com.web.forum.Entity.User updatedUser) {
         com.web.forum.Entity.User user = userDAO.readName(oldName);
+        //Check if currently updating user exists
         if (user == null) {
             throw new NotFoundError("User '" + oldName + "' not found");
         }
-        if (userDAO.readName(newUser.getName()) != null) {
+        //Check if user with new name already exists
+        if (userDAO.readName(updatedUser.getName()) != null) {
             throw new ConflictError("An User with this name already exists");
 
         }
-        return userDAO.update(newUser);
+        return userDAO.update(updatedUser);
     }
 
     //Delete an User by username

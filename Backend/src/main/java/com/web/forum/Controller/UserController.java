@@ -1,6 +1,5 @@
 package com.web.forum.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +17,11 @@ import com.web.forum.Service.UserService;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     //Return an User by username
     @GetMapping("/get/{username}")
@@ -29,8 +31,8 @@ public class UserController {
 
     //Update user
     @PutMapping("/update/{oldUserName}")
-    public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody User newUser) {
-       return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(oldUserName, newUser));
+    public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody User updatedUser) {
+       return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(oldUserName, updatedUser));
     }
 
     //Delete an User by username

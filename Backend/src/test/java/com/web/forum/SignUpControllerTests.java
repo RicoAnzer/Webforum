@@ -38,19 +38,23 @@ import jakarta.servlet.http.Cookie;
 @AutoConfigureMockMvc(addFilters = true)
 public class SignUpControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private UserService userService;
+    private final MockMvc mockMvc;
+    private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     private String registerRequestBody;
     private String loginRequestBody;
     private RegistrationRequest regRequest;
     private LoginCredentials credentials;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private static final Logger log = LoggerFactory.getLogger(SignUpControllerTests.class);
+
+    @Autowired
+    public SignUpControllerTests(MockMvc mockMvc, UserService userService, ObjectMapper objectMapper) {
+        this.mockMvc = mockMvc;
+        this.userService = userService;
+        this.objectMapper = objectMapper;
+    }
 
     @BeforeAll
     public void setUp() {
@@ -59,7 +63,6 @@ public class SignUpControllerTests {
         this.credentials = new LoginCredentials(1L, "Alice1234", "1234");
 
         // Create requestBody for testing
-        objectMapper = new ObjectMapper();
         try {
             // RegistrationRequest object as json
             registerRequestBody = objectMapper.writeValueAsString(regRequest);

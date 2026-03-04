@@ -4,7 +4,6 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.web.forum.DAO.TopicDAO;
@@ -12,11 +11,15 @@ import com.web.forum.Entity.Topic;
 import com.web.forum.Security.Error.CustomErrors.ConflictError;
 import com.web.forum.Security.Error.CustomErrors.NotFoundError;
 
+//TopicService to manage database traffic of Topics (create, delete, etc.)
 @Service
 public class TopicService {
 
-    @Autowired
-    private TopicDAO topicDAO;
+    private final TopicDAO topicDAO;
+
+    public TopicService(TopicDAO topicDAO) {
+        this.topicDAO = topicDAO;
+    }
 
     //Add a new Topic
     public Topic createNewTopic (String name){

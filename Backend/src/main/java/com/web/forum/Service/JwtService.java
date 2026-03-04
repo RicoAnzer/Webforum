@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.web.forum.DAO.UserDAO;
@@ -17,15 +16,18 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-//All methods for jwt token handling
+//JwtService to manage all methods for jwt token handling
 @Service
 public class JwtService {
 
-    @Autowired
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
     //Generate SecretKey for jwt Token
     private final static SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
+
+    public JwtService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
 
     //Generate jwt Token
     public String generateToken(String username, long expireInterval) {

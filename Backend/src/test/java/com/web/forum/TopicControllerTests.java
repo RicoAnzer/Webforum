@@ -33,127 +33,131 @@ import com.web.forum.Service.TopicService;
 @AutoConfigureMockMvc(addFilters = true)
 public class TopicControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private TopicService topicService;
+        private final MockMvc mockMvc;
+        private final TopicService topicService;
 
-    private static final Logger log = LoggerFactory.getLogger(TopicControllerTests.class);
+        private static final Logger log = LoggerFactory.getLogger(TopicControllerTests.class);
 
-    @BeforeAll
-    public void setUp() {
-        log.info("Start TopicControllerTests...");
-        topicService.createNewTopic("First Topic");
-        topicService.createNewTopic("Second Topic");
-    }
+        @Autowired
+        public TopicControllerTests(MockMvc mockMvc, TopicService topicService) {
+                this.mockMvc = mockMvc;
+                this.topicService = topicService;
+        }
 
-    @AfterAll
-    public void cleanUp() {
-        log.info("End TopicControllerTests...");
-        topicService.deleteTopic("First Topic");
-        topicService.deleteTopic("Second Topic");
-    }
+        @BeforeAll
+        public void setUp() {
+                log.info("Start TopicControllerTests...");
+                topicService.createNewTopic("First Topic");
+                topicService.createNewTopic("Second Topic");
+        }
 
-    //Test addTopic when successful
-    @SuppressWarnings("null")
-    @Order(1)
-    @Test
-    public void addTopic() throws Exception {
-        log.info("Testing addTopic()...");
-        String topicName = "ThirdTopic";
+        @AfterAll
+        public void cleanUp() {
+                log.info("End TopicControllerTests...");
+                topicService.deleteTopic("First Topic");
+                topicService.deleteTopic("Second Topic");
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test addTopic when successful
+        @SuppressWarnings("null")
+        @Order(1)
+        @Test
+        public void addTopic() throws Exception {
+                log.info("Testing addTopic()...");
+                String topicName = "ThirdTopic";
 
-        //Expect Status Created and check created message
-        mockMvc.perform(request)
-                .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(topicName));
-    }
+                RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test addTopic when Topic already exists
-    @SuppressWarnings("null")
-    @Order(2)
-    @Test
-    public void addTopicWhenExists() throws Exception {
-        log.info("Testing addTopicWhenExists()...");
-        String topicName = "ThirdTopic";
-        String errorMessage = "Topic with this name already exists";
+                // Expect Status Created and check created message
+                mockMvc.perform(request)
+                                .andExpect(status().isCreated())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(topicName));
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test addTopic when Topic already exists
+        @SuppressWarnings("null")
+        @Order(2)
+        @Test
+        public void addTopicWhenExists() throws Exception {
+                log.info("Testing addTopicWhenExists()...");
+                String topicName = "ThirdTopic";
+                String errorMessage = "Topic with this name already exists";
 
-        //Expect Status Conflict and check created message
-        mockMvc.perform(request)
-                .andExpect(status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
-    }
+                RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test getAllTopics when Topics exist
-    @SuppressWarnings("null")
-    @Order(3)
-    @Test
-    public void getAllTopics() throws Exception {
-        log.info("Testing getAllTopics()...");
-        RequestBuilder request = MockMvcRequestBuilders.get("/topic/getAll")
-                .contentType(MediaType.APPLICATION_JSON);
+                // Expect Status Conflict and check created message
+                mockMvc.perform(request)
+                                .andExpect(status().isConflict())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
+        }
 
-        //Expect Status Ok and check returned ids
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-    }
+        // Test getAllTopics when Topics exist
+        @SuppressWarnings("null")
+        @Order(3)
+        @Test
+        public void getAllTopics() throws Exception {
+                log.info("Testing getAllTopics()...");
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/getAll")
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test getTopic when Topic exist
-    @SuppressWarnings("null")
-    @Order(4)
-    @Test
-    public void getTopicWhenExists() throws Exception {
-        log.info("Testing getTopicWhenExists()...");
-        List<Topic> topics = topicService.getAllTopics();
+                // Expect Status Ok and check returned ids
+                mockMvc.perform(request)
+                                .andExpect(status().isOk());
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", topics.get(0).getId())
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test getTopic when Topic exist
+        @SuppressWarnings("null")
+        @Order(4)
+        @Test
+        public void getTopicWhenExists() throws Exception {
+                log.info("Testing getTopicWhenExists()...");
+                List<Topic> topics = topicService.getAllTopics();
 
-        //Expect Status Ok and check returned name
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(topics.get(0).getName()));
-    }
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", topics.get(0).getId())
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test getTopics when Topic doesn't exist
-    @SuppressWarnings("null")
-    @Order(5)
-    @Test
-    public void getTopicWhenNotExists() throws Exception {
-        log.info("Testing getTopicWhenNotExists()...");
-        String errorMessage = "No Topic found";
-        RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}",-1)
-                .contentType(MediaType.APPLICATION_JSON);
+                // Expect Status Ok and check returned name
+                mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(topics.get(0).getName()));
+        }
 
-        //Expect Status NotFOund and check errorMessage
-        mockMvc.perform(request)
-                .andExpect(status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
-    }
+        // Test getTopics when Topic doesn't exist
+        @SuppressWarnings("null")
+        @Order(5)
+        @Test
+        public void getTopicWhenNotExists() throws Exception {
+                log.info("Testing getTopicWhenNotExists()...");
+                String errorMessage = "No Topic found";
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", -1)
+                                .contentType(MediaType.APPLICATION_JSON);
 
-    //Test deleteTopic
-    @SuppressWarnings("null")
-    @Order(6)
-    @Test
-    public void deleteTopic() throws Exception {
-        log.info("Testing deleteTopic()...");
-        //Delete Topic created in Test addTopic()
-        String topicName = "ThirdTopic";
-        String deleteMessage = "Topic deleted";
+                // Expect Status NotFOund and check errorMessage
+                mockMvc.perform(request)
+                                .andExpect(status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
+        }
 
-        RequestBuilder request = MockMvcRequestBuilders.delete("/topic/delete/{topicName}", topicName)
-                .contentType(MediaType.APPLICATION_JSON);
+        // Test deleteTopic
+        @SuppressWarnings("null")
+        @Order(6)
+        @Test
+        public void deleteTopic() throws Exception {
+                log.info("Testing deleteTopic()...");
+                // Delete Topic created in Test addTopic()
+                String topicName = "ThirdTopic";
+                String deleteMessage = "Topic deleted";
 
-        //Expect Status Ok and "Deleted" message
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().string(deleteMessage));
-    }
+                RequestBuilder request = MockMvcRequestBuilders.delete("/topic/delete/{topicName}", topicName)
+                                .contentType(MediaType.APPLICATION_JSON);
+
+                // Expect Status Ok and "Deleted" message
+                mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andExpect(content().string(deleteMessage));
+        }
 }

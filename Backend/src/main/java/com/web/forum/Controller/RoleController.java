@@ -1,6 +1,5 @@
 package com.web.forum.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +14,11 @@ import com.web.forum.Service.RoleService;
 @RequestMapping("/role")
 public class RoleController {
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
+
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     //Add new Role
     @PostMapping("/add/{roleName}")

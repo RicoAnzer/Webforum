@@ -28,22 +28,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = true)
 public class RoleControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
     private static final Logger log = LoggerFactory.getLogger(RoleControllerTests.class);
 
+    @Autowired
+    public RoleControllerTests(MockMvc mockMvc) {
+        this.mockMvc = mockMvc;
+    }
+
     @BeforeAll
-    public void setUp(){
+    public void setUp() {
         log.info("Start RoleControllerTests...");
     }
 
     @AfterAll
-    public void cleanUp(){
+    public void cleanUp() {
         log.info("End RoleControllerTests...");
     }
 
-    //Test addRole
+    // Test addRole
     @SuppressWarnings("null")
     @Order(1)
     @Test
@@ -55,13 +59,13 @@ public class RoleControllerTests {
         RequestBuilder request = MockMvcRequestBuilders.post("/role/add/{roleName}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
-        //Expect Status Created and check created message
+        // Expect Status Created and check created message
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andExpect(content().string(responseMessage));
     }
 
-    //Test addRole when name already exists
+    // Test addRole when name already exists
     @SuppressWarnings("null")
     @Order(2)
     @Test
@@ -73,27 +77,26 @@ public class RoleControllerTests {
         RequestBuilder request = MockMvcRequestBuilders.post("/role/add/{roleName}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
-        //Expect Status Conflict and check error message
+        // Expect Status Conflict and check error message
         mockMvc.perform(request)
                 .andExpect(status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorMessage));
     }
 
-
-    //Test deleteRole
+    // Test deleteRole
     @SuppressWarnings("null")
     @Order(3)
     @Test
     public void deleteRole() throws Exception {
         log.info("Testing deleteRole()...");
-        //Delete Role created in addRole()
+        // Delete Role created in addRole()
         String roleName = "Role1";
         String deleteMessage = "Role deleted";
 
         RequestBuilder request = MockMvcRequestBuilders.delete("/role/delete/{username}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
-        //Expect Status Ok and "Deleted" message
+        // Expect Status Ok and "Deleted" message
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().string(deleteMessage));
