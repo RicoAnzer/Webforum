@@ -23,7 +23,7 @@ public class ThreadController {
     }
 
     //Add a new Thread
-    @PostMapping(value = {"/add/{topicSlug}/{threadName}", "/add/{topicSlug}/"})
+    @PostMapping(value = {"/{topicSlug}/{threadName}", "/add/{topicSlug}/"})
     public ResponseEntity<?> addThread(@PathVariable String topicSlug, @PathVariable(required = false) String threadName) {
         //Validating input (threadName) => topicSlug is always existing, otherwise no Thread can be added
         if (threadName == null || threadName.trim().isEmpty()) {
@@ -33,19 +33,19 @@ public class ThreadController {
     }
 
     //Return Thread based on name
-    @GetMapping("/get/{threadName}")
+    @GetMapping("/{threadName}")
     public ResponseEntity<?> getThread(@PathVariable String threadName) {
         return ResponseEntity.status(HttpStatus.OK).body(threadService.getThreadByName(threadName));
     }
 
     //Return all Threads of a specific Topic
-    @GetMapping("/getAll/{topicSlug}")
+    @GetMapping("/all/{topicSlug}")
     public ResponseEntity<?> getAllThreads(@PathVariable String topicSlug) {
         return ResponseEntity.status(HttpStatus.OK).body(threadService.getAllThreads(topicSlug));
     }
 
     //Deletes Thread by name
-    @DeleteMapping("/delete/{threadName}")
+    @DeleteMapping("/{threadName}")
     public ResponseEntity<?> deleteThread(@PathVariable String threadName) {
         return ResponseEntity.status(HttpStatus.OK).body(threadService.deleteThread(threadName));
     }

@@ -59,11 +59,11 @@ public class DatabaseManager {
             //Initialize table for users
             String createUserSQL = "CREATE TABLE IF NOT EXISTS users ("
                     + "id SERIAL PRIMARY KEY,"
-                    + "name VarChar(20), "
+                    + "name VarChar(30), "
                     + "password Text, "
                     + "profile_image_path VarChar(100), "
-                    + "created_at VarChar(10), "
-                    + "deleted_at VarChar(10), "
+                    + "created_at timestamp, "
+                    + "deleted_at timestamp, "
                     + "is_banned Boolean"
                     + ")";
             //Initialize table for user roles 
@@ -85,6 +85,9 @@ public class DatabaseManager {
                     + "user_id INT, "
                     + "thread_slug VarChar(50), "
                     + "content JSONB, "
+                    + "created_at timestamp, "
+                    + "updated_at timestamp, "
+                    + "deleted Boolean, "
                     + "CONSTRAINT fk_user_id FOREIGN KEY (user_id)"
                     + "REFERENCES users(id) ON DELETE SET NULL,"
                     + "CONSTRAINT fk_thread_slug FOREIGN KEY (thread_slug)"

@@ -70,6 +70,7 @@ class UserControllerTests {
     @AfterAll
     public void cleanUp(){
         log.info("End UserControllerTests...");
+        userService.deleteUser("Herbert1234");
     }
 
     //Test getUser when searched User exists
@@ -78,9 +79,8 @@ class UserControllerTests {
     @Test
     public void getUserWhenExists() throws Exception {
         log.info("Testing getUserWhenExists()...");
-        RequestBuilder request = MockMvcRequestBuilders.get("/user/get/{username}", mockUser.getUsername())
+        RequestBuilder request = MockMvcRequestBuilders.get("/user/{username}", mockUser.getUsername())
                 .contentType(MediaType.APPLICATION_JSON);
-
         //Expect Status Ok and check returned name
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -96,7 +96,7 @@ class UserControllerTests {
         log.info("Testing getUserWhenNotExists()...");
         String username = "Alice4321";
         String errorMessage = "User '" + username + "' not found";
-        RequestBuilder request = MockMvcRequestBuilders.get("/user/get/{username}", username)
+        RequestBuilder request = MockMvcRequestBuilders.get("/user/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON);
 
         //Expect Status NotFound and error message
@@ -122,7 +122,7 @@ class UserControllerTests {
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(updatedUser);
 
-            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", oldUser.getName())
+            RequestBuilder request = MockMvcRequestBuilders.put("/user/{oldUserName}", oldUser.getName())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
@@ -153,7 +153,7 @@ class UserControllerTests {
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(updatedUser);
 
-            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", username)
+            RequestBuilder request = MockMvcRequestBuilders.put("/user/{oldUserName}", username)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
@@ -183,7 +183,7 @@ class UserControllerTests {
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBody = objectMapper.writeValueAsString(updatedUser);
 
-            RequestBuilder request = MockMvcRequestBuilders.put("/user/update/{oldUserName}", mockUser2.getUsername())
+            RequestBuilder request = MockMvcRequestBuilders.put("/user/{oldUserName}", mockUser2.getUsername())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody);
 
@@ -207,10 +207,10 @@ class UserControllerTests {
         String deleteMessage2 = "Deleted User '" + mockUser2.getUsername() + "'";
 
         //Delete Herbert using his new name after updating
-        RequestBuilder request1 = MockMvcRequestBuilders.delete("/user/delete/{username}", newName)
+        RequestBuilder request1 = MockMvcRequestBuilders.delete("/user/{username}", newName)
                 .contentType(MediaType.APPLICATION_JSON);
         //Delete Franz
-        RequestBuilder request2 = MockMvcRequestBuilders.delete("/user/delete/{username}", mockUser2.getUsername())
+        RequestBuilder request2 = MockMvcRequestBuilders.delete("/user/{username}", mockUser2.getUsername())
                 .contentType(MediaType.APPLICATION_JSON);
 
         //Delete Herbert and Franz created in setUp()

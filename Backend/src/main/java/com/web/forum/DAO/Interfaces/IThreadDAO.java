@@ -5,6 +5,7 @@ import java.util.List;
 import com.web.forum.Entity.Thread;
 
 public interface IThreadDAO {
+    
     //Create and save new Thread of a specific topic
     public Thread create(String topicSlug, Thread thread);
 

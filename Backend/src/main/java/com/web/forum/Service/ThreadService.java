@@ -22,7 +22,7 @@ public class ThreadService {
     }
 
     //Save a new Thread to database
-    public Thread createNewThread(String threadSlug, String name) {
+    public Thread createNewThread(String topicSLug, String name) {
         if (threadDAO.readByName(name) != null) {
             throw new ConflictError("Thread with this name already exists");
         }
@@ -42,8 +42,8 @@ public class ThreadService {
                                       .replaceAll("-")
                                       .replaceAll("^-|-$", "");
 
-        Thread createdThread = new Thread(null,threadSlug, name, slug);
-        return threadDAO.create(threadSlug, createdThread);
+        Thread createdThread = new Thread(null,topicSLug, name, slug);
+        return threadDAO.create(topicSLug, createdThread);
     }
 
     //Search and return Threads based on ID

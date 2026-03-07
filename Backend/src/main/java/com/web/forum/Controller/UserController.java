@@ -24,19 +24,19 @@ public class UserController {
     }
 
     //Return an User by username
-    @GetMapping("/get/{username}")
+    @GetMapping("/{username}")
     public ResponseEntity<?> getUser(@PathVariable String username) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByName(username));
     }
 
     //Update user
-    @PutMapping("/update/{oldUserName}")
+    @PutMapping("/{oldUserName}")
     public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody User updatedUser) {
        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(oldUserName, updatedUser));
     }
 
     //Delete an User by username
-    @DeleteMapping("/delete/{username}")
+    @DeleteMapping("/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(username));
     }

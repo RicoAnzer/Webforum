@@ -56,7 +56,7 @@ public class RoleControllerTests {
         String roleName = "Role1";
         String responseMessage = "Role '" + roleName + "' created";
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/role/add/{roleName}", roleName)
+        RequestBuilder request = MockMvcRequestBuilders.post("/role/{roleName}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
         // Expect Status Created and check created message
@@ -74,7 +74,7 @@ public class RoleControllerTests {
         String roleName = "Role1";
         String errorMessage = "Role with this name already exists";
 
-        RequestBuilder request = MockMvcRequestBuilders.post("/role/add/{roleName}", roleName)
+        RequestBuilder request = MockMvcRequestBuilders.post("/role/{roleName}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
         // Expect Status Conflict and check error message
@@ -93,7 +93,7 @@ public class RoleControllerTests {
         String roleName = "Role1";
         String deleteMessage = "Role deleted";
 
-        RequestBuilder request = MockMvcRequestBuilders.delete("/role/delete/{username}", roleName)
+        RequestBuilder request = MockMvcRequestBuilders.delete("/role/{username}", roleName)
                 .contentType(MediaType.APPLICATION_JSON);
 
         // Expect Status Ok and "Deleted" message

@@ -39,8 +39,8 @@ public class SignUpController {
         if ("".equals(password)) {
             throw new BadRequestError("Please choose a password");
         }
-        if (username.length() > 20) {
-            throw new BadRequestError("Please choose an username with less than 20 characters");
+        if (username.length() > 30) {
+            throw new BadRequestError("Please choose an username with less than 30 characters");
         }
         if (!password.equals(confirmedPassword)) {
             throw new BadRequestError("Password and confirmedPassword don't match");

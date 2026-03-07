@@ -32,7 +32,7 @@
     "error.formLogin.alreadyLoggedIn":          "User is already logged in",
 
     "error.formRegister.userEmpty":             "Username is empty",
-    "error.formRegister.usernameTooLong":       "Please choose an username with less than 20 characters",
+    "error.formRegister.usernameTooLong":       "Please choose an username with less than 30 characters",
     "error.formRegister.usernameExists":        "Username already exists",
     "error.formRegister.passwordEmpty":         "Please choose a password",
     "error.formRegister.passwordNotMatching":   "Password and confirmed Password don't match"

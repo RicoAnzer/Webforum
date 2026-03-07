@@ -63,7 +63,7 @@ export const Header = () => {
         const getTopics = async () => {
             try {
                 const response = await axios
-                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic/getAll`, {
+                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic`, {
                         withCredentials: true,
                         headers: header
                     })

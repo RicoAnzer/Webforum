@@ -37,6 +37,7 @@ public class SecurityConfig {
                         "/auth/register",
                         "/topic/**",
                         "/thread/**",
+                        "/post/**",
                         "/role/**",
                         "/user/**",
                         "/error").permitAll()

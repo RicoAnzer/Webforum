@@ -75,7 +75,7 @@ function Main() {
         case "Username is empty":
           setErrorMessage(<FormattedMessage id="error.formRegister.userEmpty" />)
           break;
-        case "Please choose an username with less than 20 characters":
+        case "Please choose an username with less than 30 characters":
           setErrorMessage(<FormattedMessage id="error.formRegister.usernameTooLong" />)
           break;
         case "Username already exists":
@@ -129,7 +129,7 @@ function Main() {
     try {
       if (event) event.preventDefault();
       const response = await axios
-        .post(`https://${import.meta.env.VITE_SPRING_URL}/topic/add/${addTopicInput}`, {}, {
+        .post(`https://${import.meta.env.VITE_SPRING_URL}/topic/${addTopicInput}`, {}, {
           withCredentials: true,
           headers: header
         })

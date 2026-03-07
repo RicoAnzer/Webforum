@@ -7,7 +7,7 @@ const header = {
 //Load Array of Threads of current topic
 export const threadLoader = async ({ params }) => {
     const response = await axios
-        .get(`https://${import.meta.env.VITE_SPRING_URL}/thread/getAll/${params.topicSlug}`, {
+        .get(`https://${import.meta.env.VITE_SPRING_URL}/thread/${params.topicSlug}`, {
             withCredentials: true,
             headers: header
         });

@@ -21,13 +21,13 @@ public class RoleController {
     }
 
     //Add new Role
-    @PostMapping("/add/{roleName}")
+    @PostMapping("/{roleName}")
     public ResponseEntity<?> addRole(@PathVariable String roleName) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roleService.createRole(roleName));
     }
 
     //Delete existing Role
-    @DeleteMapping("/delete/{roleName}")
+    @DeleteMapping("/{roleName}")
     public ResponseEntity<?> deleteRole(@PathVariable String roleName) {
         return ResponseEntity.status(HttpStatus.OK).body(roleService.deleteRole(roleName));
     }

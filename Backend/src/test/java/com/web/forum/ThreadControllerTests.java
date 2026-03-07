@@ -2,6 +2,8 @@ package com.web.forum;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -76,7 +78,7 @@ public class ThreadControllerTests {
                 String threadName = "ThirdThread";
 
                 RequestBuilder request = MockMvcRequestBuilders
-                                .post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
+                                .post("/thread/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Created and check created message
@@ -97,7 +99,7 @@ public class ThreadControllerTests {
                 String errorMessage = "Thread with this name already exists";
 
                 RequestBuilder request = MockMvcRequestBuilders
-                                .post("/thread/add/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
+                                .post("/thread/{topicSlug}/{name}", mockTopic.getSlug(), threadName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Conflict and check created message
@@ -112,12 +114,13 @@ public class ThreadControllerTests {
         @Test
         public void getAllThreads() throws Exception {
                 log.info("Testing getAllThreads()...");
-                RequestBuilder request = MockMvcRequestBuilders.get("/thread/getAll/{topicSlug}", mockTopic.getSlug())
+                RequestBuilder request = MockMvcRequestBuilders.get("/thread/all/{topicSlug}", mockTopic.getSlug())
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Ok and check returned ids
                 mockMvc.perform(request)
-                                .andExpect(status().isOk());
+                                .andExpect(status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(greaterThan(2))));
         }
 
         // Test getThread when Thread exist
@@ -128,7 +131,7 @@ public class ThreadControllerTests {
                 log.info("Testing getThreadWhenExists()...");
                 List<Thread> threads = threadService.getAllThreads(mockTopic.getSlug());
                 RequestBuilder request = MockMvcRequestBuilders
-                                .get("/thread/get/{threadName}", threads.get(0).getName())
+                                .get("/thread/{threadName}", threads.get(0).getName())
                                 .contentType(MediaType.APPLICATION_JSON);
                 // Expect Status Ok and check returned name
                 mockMvc.perform(request)
@@ -145,7 +148,7 @@ public class ThreadControllerTests {
                 log.info("Testing getThreadWhenNotExists()...");
                 String errorMessage = "No Thread found";
                 RequestBuilder request = MockMvcRequestBuilders
-                                .get("/thread/get/{threadName}", "Non existent Thread name")
+                                .get("/thread/{threadName}", "Non existent Thread name")
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status NotFound and check errorMessage
@@ -164,7 +167,7 @@ public class ThreadControllerTests {
                 String threadName = "ThirdThread";
                 String deleteMessage = "Thread deleted";
 
-                RequestBuilder request = MockMvcRequestBuilders.delete("/thread/delete/{threadName}", threadName)
+                RequestBuilder request = MockMvcRequestBuilders.delete("/thread/{threadName}", threadName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Ok and "Deleted" message

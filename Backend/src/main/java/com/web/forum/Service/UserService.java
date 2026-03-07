@@ -1,6 +1,6 @@
 package com.web.forum.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,30 +83,28 @@ public class UserService implements UserDetailsService {
     public LoginCredentials registerNewUser(RegistrationRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
-        
+
         // Check if username already exists (if it doesn't exist: readName() == null)
         if (userDAO.readName(username) == null) {
             // Encode password
             String encodedPassword = passwordEncoder().encode(password);
             // Format createdAt to "dd-MM-YYYY"
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            // Id null to auto generate id at database
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
             Long id = null;
-
-            // Empty roles List as placeholder
-            // => Roles List shows all roles assigned to user for later use in Frontend
-            // (E.g. Only Moderators can add Topics, so Button to add them is invisible for
-            // common users)
-            // => User and Roles getting assigned in later step in table user_roles
-            List<String> roles = new ArrayList<>();
-
             // Create User Object
+            // => id is automatically created inside database, id can be null at this stage
+            // => Empty roles List as placeholder -> shows all roles assigned to user for
+            // later use in Frontend
+            // => User and Roles getting assigned in later step in table user_roles
+            // => deletedAt should be null at creation, set date only after User deleted
+            // account
+            // => isBanned is false at default, doesn't need to be set here
             com.web.forum.Entity.User newUser = new com.web.forum.Entity.User(
                     id,
                     username,
-                    roles,
+                    new ArrayList<>(),
                     "",
-                    LocalDate.now().format(dateTimeFormatter),
+                    LocalDateTime.now().format(dateTimeFormatter),
                     "",
                     false);
 
@@ -203,7 +201,7 @@ public class UserService implements UserDetailsService {
         throw new UnauthorizedError("Not logged in");
     }
 
-    //Return an User by username
+    // Return an User by username
     public com.web.forum.Entity.User getUserByName(String username) {
         com.web.forum.Entity.User user = userDAO.readName(username);
         if (user == null) {
@@ -212,14 +210,14 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    //Update user
+    // Update user
     public com.web.forum.Entity.User updateUser(String oldName, com.web.forum.Entity.User updatedUser) {
         com.web.forum.Entity.User user = userDAO.readName(oldName);
-        //Check if currently updating user exists
+        // Check if currently updating user exists
         if (user == null) {
             throw new NotFoundError("User '" + oldName + "' not found");
         }
-        //Check if user with new name already exists
+        // Check if updated name already exists
         if (userDAO.readName(updatedUser.getName()) != null) {
             throw new ConflictError("An User with this name already exists");
 
@@ -227,7 +225,7 @@ public class UserService implements UserDetailsService {
         return userDAO.update(updatedUser);
     }
 
-    //Delete an User by username
+    // Delete an User by username
     public String deleteUser(String username) {
         return userDAO.delete(username);
     }

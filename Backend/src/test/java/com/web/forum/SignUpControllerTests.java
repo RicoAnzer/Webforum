@@ -90,7 +90,7 @@ public class SignUpControllerTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(registerRequestBody);
 
-            // Expect Status Created and check returned id
+            // Expect Status Created and check returned username
             mockMvc.perform(requestB)
                     .andExpect(status().isCreated())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -159,8 +159,8 @@ public class SignUpControllerTests {
     public void registerUserUsernameTooLong() {
         log.info("Testing registerUserUsernameTooLong()...");
         try {
-            String errorMessage = "Please choose an username with less than 20 characters";
-            RegistrationRequest wrongRequest = new RegistrationRequest("Franz12345678901234567890", "1234", "1234");
+            String errorMessage = "Please choose an username with less than 30 characters";
+            RegistrationRequest wrongRequest = new RegistrationRequest("Franz123456789012345678902345678901234567890", "1234", "1234");
 
             // False RegistrationRequest object as json
             String requestBody = objectMapper.writeValueAsString(wrongRequest);

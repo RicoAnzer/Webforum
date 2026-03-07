@@ -23,7 +23,7 @@ public class TopicController {
     }
 
     //Add a new Topic
-    @PostMapping(value = {"/add/{name}", "/add/"})
+    @PostMapping(value = {"/{name}", "/add/"})
     public ResponseEntity<?> addTopic(@PathVariable(required = false) String name) {
         if (name == null || name.trim().isEmpty()){
             throw new ConflictError("Topic is empty");
@@ -32,19 +32,19 @@ public class TopicController {
     }
 
     //Return Topic based on ID
-    @GetMapping("/get/{ID}")
+    @GetMapping("/{ID}")
     public ResponseEntity<?> getTopic(@PathVariable Long ID) {
         return  ResponseEntity.status(HttpStatus.OK).body(topicService.getTopicById(ID));
     }
 
     //Return all Topics
-    @GetMapping("/getAll")
+    @GetMapping("/")
     public ResponseEntity<?> getAllTopics() {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.getAllTopics()); 
     }
 
     //Deletes Topic by name
-    @DeleteMapping("/delete/{topicName}")
+    @DeleteMapping("/{topicName}")
     public ResponseEntity<?> deleteTopic(@PathVariable String topicName) {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.deleteTopic(topicName));
     }

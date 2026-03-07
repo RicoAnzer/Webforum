@@ -60,7 +60,7 @@ export const ThreadList = () => {
         try {
             if (event) event.preventDefault();
             const response = await axios
-                .post(`https://${import.meta.env.VITE_SPRING_URL}/thread/add/${topicSlug}/${addThreadInput}`, {}, {
+                .post(`https://${import.meta.env.VITE_SPRING_URL}/thread/all/${topicSlug}/${addThreadInput}`, {}, {
                     withCredentials: true,
                     headers: header
                 })

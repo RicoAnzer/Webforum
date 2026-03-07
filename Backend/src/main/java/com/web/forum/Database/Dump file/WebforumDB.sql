@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict tQdnox6wkdhgFKL1M66d0alQoNnR49RCPVgyh10Q9zrIJN4wOoHKshZdsH8Jsbw
+\restrict qmWiaBNj10yi4ua3sMU5jr2am7kXZVdJXxQdgsBBN4FvGTyPqc3S8cCDnFpp65I
 
--- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
--- Dumped by pg_dump version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
+-- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+-- Dumped by pg_dump version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -30,7 +30,10 @@ CREATE TABLE public.posts (
     id integer NOT NULL,
     user_id integer,
     thread_slug character varying(50),
-    content jsonb
+    content jsonb,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    deleted boolean
 );
 
 
@@ -181,11 +184,11 @@ ALTER TABLE public.user_roles OWNER TO postgres;
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    name character varying(20),
+    name character varying(30),
     password text,
     profile_image_path character varying(100),
-    created_at character varying(10),
-    deleted_at character varying(10),
+    created_at timestamp without time zone,
+    deleted_at timestamp without time zone,
     is_banned boolean
 );
 
@@ -253,7 +256,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.posts (id, user_id, thread_slug, content) FROM stdin;
+COPY public.posts (id, user_id, thread_slug, content, created_at, updated_at, deleted) FROM stdin;
 \.
 
 
@@ -435,5 +438,5 @@ ALTER TABLE ONLY public.user_roles
 -- PostgreSQL database dump complete
 --
 
-\unrestrict tQdnox6wkdhgFKL1M66d0alQoNnR49RCPVgyh10Q9zrIJN4wOoHKshZdsH8Jsbw
+\unrestrict qmWiaBNj10yi4ua3sMU5jr2am7kXZVdJXxQdgsBBN4FvGTyPqc3S8cCDnFpp65I
 

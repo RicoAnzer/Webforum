@@ -66,7 +66,7 @@ public class TopicControllerTests {
                 log.info("Testing addTopic()...");
                 String topicName = "ThirdTopic";
 
-                RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
+                RequestBuilder request = MockMvcRequestBuilders.post("/topic/{name}", topicName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Created and check created message
@@ -85,7 +85,7 @@ public class TopicControllerTests {
                 String topicName = "ThirdTopic";
                 String errorMessage = "Topic with this name already exists";
 
-                RequestBuilder request = MockMvcRequestBuilders.post("/topic/add/{name}", topicName)
+                RequestBuilder request = MockMvcRequestBuilders.post("/topic/{name}", topicName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Conflict and check created message
@@ -100,7 +100,7 @@ public class TopicControllerTests {
         @Test
         public void getAllTopics() throws Exception {
                 log.info("Testing getAllTopics()...");
-                RequestBuilder request = MockMvcRequestBuilders.get("/topic/getAll")
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/")
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Ok and check returned ids
@@ -116,7 +116,7 @@ public class TopicControllerTests {
                 log.info("Testing getTopicWhenExists()...");
                 List<Topic> topics = topicService.getAllTopics();
 
-                RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", topics.get(0).getId())
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/{ID}", topics.get(0).getId())
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Ok and check returned name
@@ -133,7 +133,7 @@ public class TopicControllerTests {
         public void getTopicWhenNotExists() throws Exception {
                 log.info("Testing getTopicWhenNotExists()...");
                 String errorMessage = "No Topic found";
-                RequestBuilder request = MockMvcRequestBuilders.get("/topic/get/{ID}", -1)
+                RequestBuilder request = MockMvcRequestBuilders.get("/topic/{ID}", -1)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status NotFOund and check errorMessage
@@ -152,7 +152,7 @@ public class TopicControllerTests {
                 String topicName = "ThirdTopic";
                 String deleteMessage = "Topic deleted";
 
-                RequestBuilder request = MockMvcRequestBuilders.delete("/topic/delete/{topicName}", topicName)
+                RequestBuilder request = MockMvcRequestBuilders.delete("/topic/{topicName}", topicName)
                                 .contentType(MediaType.APPLICATION_JSON);
 
                 // Expect Status Ok and "Deleted" message

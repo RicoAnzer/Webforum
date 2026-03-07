@@ -64,7 +64,7 @@ public class ThreadDAO implements IThreadDAO {
     //Search and return Threads based on ID
     @Override
     public Thread readByName(String name) {
-        //SQL Statement to return Thread of specific ID
+        //SQL Statement to return Thread of specific name
         String readSQL = "Select * FROM threads WHERE name = ?;";
         //Thread placeholder
         Thread thread = null;
