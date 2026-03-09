@@ -66,3 +66,23 @@ body {
   border: 1px solid var(--border-color);
   background-color: var(--secondary-background-color);
 }
+
+.button-container {
+  padding: 10px;
+  border-left: 1px solid var(--border-color);
+  margin-left: auto;
+  align-content: center;
+}
+
+.button-holder {
+  display: flex;
+   gap: 10px;
+}
+
+.button-container .submit-btn {
+  width: 100px;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px;
+  overflow-wrap: break-word;
+}

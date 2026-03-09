@@ -63,7 +63,7 @@ export const Header = () => {
         const getTopics = async () => {
             try {
                 const response = await axios
-                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic`, {
+                    .get(`https://${import.meta.env.VITE_SPRING_URL}/topic/`, {
                         withCredentials: true,
                         headers: header
                     })
@@ -87,7 +87,7 @@ export const Header = () => {
     return (
         <header>
             <DisplayTopics topicsList={topics}></DisplayTopics>
-            <div className='profile-container'>
+            <div className='button-container'>
                 {/**Display if logged in*/}
                 {user != null &&
                     <div className='profile'>

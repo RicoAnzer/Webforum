@@ -107,14 +107,11 @@ public class UserDAO implements IUserDAO {
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
             // Create new User Object using results from statement above
-            // For every entry...
             while (result.next()) {
-                // ...use placeholder List => must be later replaced using UserRoleRepository...
                 List<String> roles = userRoleDAO.readById(result.getLong("id"));
                 // Check if deletedAt was set or not => return null if not set
                 LocalDateTime deletedAt = result.getObject("deleted_at", LocalDateTime.class);
                 String formattedDeletedAt = (deletedAt != null) ? deletedAt.format(dateTimeFormatter) : null;
-                // ...and create new User Object
                 user = new User(
                         result.getLong("id"),
                         result.getString("name"),
@@ -137,20 +134,42 @@ public class UserDAO implements IUserDAO {
         // => User Object = Object containing changed settings
         // => Fields id, profileImagePath and createdAt are unchangeable
         String updateSQL = "UPDATE users SET name = ?, deleted_at = ?, is_banned = ? "
-                + "WHERE id = ?;";
+                + "WHERE id = ? "
+                + "RETURNING id, name, profile_image_path, created_at, deleted_at, is_banned;";
+        User user = null;
+        // Format createdAt to "dd-MM-YYYY"
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
         // Execute statement
         try (PreparedStatement statement = connection.prepareStatement(updateSQL)) {
             // Check if deletedAt is set or not => return null if not set
-            LocalDateTime deletedAt = (updatedUser.getDeletedAt() != null) ? LocalDateTime.parse(updatedUser.getDeletedAt()) : null;
+            LocalDateTime deletedAt = (updatedUser.getDeletedAt() != null && !updatedUser.getDeletedAt().isBlank())
+                    ? LocalDateTime.parse(updatedUser.getDeletedAt())
+                    : null;
             statement.setString(1, updatedUser.getName());
             statement.setObject(2, deletedAt);
             statement.setBoolean(3, updatedUser.getIsBanned());
             statement.setLong(4, updatedUser.getId());
-            statement.executeUpdate();
+            ResultSet result = statement.executeQuery();
+            //Return updated data
+            while (result.next()) {
+                List<String> roles = userRoleDAO.readById(result.getLong("id"));
+                // Check if updated deletedAt was set or not => return null if not set
+                LocalDateTime updatedDeletedAt = result.getObject("deleted_at", LocalDateTime.class);
+                String formattedDeletedAt = (updatedDeletedAt != null) ? updatedDeletedAt.format(dateTimeFormatter)
+                        : null;
+                user = new User(
+                        result.getLong("id"),
+                        result.getString("name"),
+                        roles,
+                        result.getString("profile_image_path"),
+                        result.getObject("created_at", LocalDateTime.class).format(dateTimeFormatter),
+                        formattedDeletedAt,
+                        result.getBoolean("is_Banned"));
+            }
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return updatedUser;
+        return user;
     }
 
     // Delete existing Topic based on id

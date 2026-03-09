@@ -151,6 +151,7 @@ public class PostDAO implements IPostDAO {
                 // Check if updatedAt was set or not => return null if not set
                 LocalDateTime updatedAt = result.getObject("updated_at", LocalDateTime.class);
                 String formattedUpdatedAt = (updatedAt != null) ? updatedAt.format(dateTimeFormatter) : null;
+
                 Post post = new Post(
                         result.getLong("id"),
                         result.getLong("user_id"),
@@ -161,7 +162,6 @@ public class PostDAO implements IPostDAO {
                         result.getBoolean("deleted"));
 
                 posts.add(post);
-
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
@@ -175,24 +175,50 @@ public class PostDAO implements IPostDAO {
         // To change Post:
         // => updatedPost Object = Object containing changed settings
         // => Fields id, user_id, thread_slug and createdAt are unchangeable
-        String updateSQL = "UPDATE posts SET content = ?, created_at = ?, updated_at = ?, deleted = ? "
-                + "WHERE id = ?;";
+        String updateSQL = "UPDATE posts SET content = ?, updated_at = ?, deleted = ? "
+                + "WHERE id = ? "
+                + "RETURNING id, user_id, thread_slug, content, created_at, updated_at, deleted;";
+        Post post = null;
         // Format createdAt to "dd-MM-YYYY"
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
         // Execute statement
         try (PreparedStatement statement = connection.prepareStatement(updateSQL)) {
             // Check if updatedAt is set or not => return null if not set
-            LocalDateTime updatedAt = (updatedPost.getUpdated_at() != null && !updatedPost.getUpdated_at().isBlank()) ? LocalDateTime.parse(updatedPost.getUpdated_at()) : null;
+            LocalDateTime updatedAt = (updatedPost.getUpdated_at() != null && !updatedPost.getUpdated_at().isBlank()) 
+            ? LocalDateTime.parse(updatedPost.getUpdated_at()) 
+            : null;
             statement.setObject(1, updatedPost.getContent().toString(), Types.OTHER);
-            statement.setObject(2, LocalDateTime.parse(updatedPost.getCreated_at(), dateTimeFormatter));
-            statement.setObject(3, updatedAt);
-            statement.setBoolean(4, updatedPost.getDeleted());
-            statement.setLong(5, updatedPost.getId());
-            statement.executeUpdate();
+            statement.setObject(2, updatedAt);
+            statement.setBoolean(3, updatedPost.getDeleted());
+            statement.setLong(4, updatedPost.getId());
+            ResultSet result = statement.executeQuery();
+            //Return updated data
+            while (result.next()) {
+                // Check if updated updated_at was set or not => return null if not set
+                LocalDateTime newUpdatedAt = result.getObject("updated_at", LocalDateTime.class);
+                String formattedUpdatedAt = (newUpdatedAt != null) ? newUpdatedAt.format(dateTimeFormatter)
+                        : null;
+                 // Retrieve and convert updated jsonb to JsonNode
+                String contentJson = result.getString("content");
+                JsonNode updatedContent = null;
+                try {
+                    updatedContent = objectMapper.readTree(contentJson);
+                } catch (JsonProcessingException e) {
+                    log.error(e.getMessage());
+                }
+                post = new Post(
+                        result.getLong("id"),
+                        result.getLong("user_id"),
+                        result.getString("thread_slug"),
+                        updatedContent,
+                        result.getObject("created_at", LocalDateTime.class).format(dateTimeFormatter),
+                        formattedUpdatedAt,
+                        result.getBoolean("deleted"));
+            }
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
-        return updatedPost;
+        return post;
     }
 
     // Delete existing Post

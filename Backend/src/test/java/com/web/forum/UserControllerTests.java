@@ -145,7 +145,7 @@ class UserControllerTests {
         log.info("Testing updateUserWhenNotExists()...");
         try {
             String username = "Peter1234";
-            User mockedUser = userService.getUserByName(mockUser.getUsername());
+            User mockedUser = userService.getUserByName(newName);
             User updatedUser = new User(mockedUser.getId(), username, null, null, null, null, false);
             String errorMessage = "User '" + username + "' not found";
 

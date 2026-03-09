@@ -83,7 +83,7 @@ public class UserService implements UserDetailsService {
     public LoginCredentials registerNewUser(RegistrationRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
-
+        
         // Check if username already exists (if it doesn't exist: readName() == null)
         if (userDAO.readName(username) == null) {
             // Encode password

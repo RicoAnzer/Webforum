@@ -42,10 +42,8 @@ const DisplayThreads = ({ threadList }) => {
 
 /**Displaying Threads of current Topic*/
 export const ThreadList = () => {
-    //Get data of url
-    const { topicSlug } = useParams();
     //Load data of threadLoader => List of all Threads
-    const threads = useLoaderData();
+    const { topicSlug, threads } = useLoaderData();
 
     const revalidator = useRevalidator();
     const intl = useIntl();
@@ -60,7 +58,7 @@ export const ThreadList = () => {
         try {
             if (event) event.preventDefault();
             const response = await axios
-                .post(`https://${import.meta.env.VITE_SPRING_URL}/thread/all/${topicSlug}/${addThreadInput}`, {}, {
+                .post(`https://${import.meta.env.VITE_SPRING_URL}/thread/${topicSlug}/${addThreadInput}`, {}, {
                     withCredentials: true,
                     headers: header
                 })
@@ -91,8 +89,7 @@ export const ThreadList = () => {
         <div className="thread-list">
             <DisplayThreads threadList={threads}></DisplayThreads>
             {/**Add thread popup */}
-            {
-                addThreadVisible &&
+            { addThreadVisible &&
                 <div className="register-container popup addThread">
                     <h1 className='headline'><FormattedMessage id="forum.form.addThread" /></h1>
                     <form className="register-form" onSubmit={addThread}>
