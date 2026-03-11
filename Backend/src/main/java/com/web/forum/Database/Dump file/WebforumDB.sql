@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict qmWiaBNj10yi4ua3sMU5jr2am7kXZVdJXxQdgsBBN4FvGTyPqc3S8cCDnFpp65I
+\restrict q4WjDiEPmeJphisMq8ZNeTTvSXONgRlQbjEt4JNcloQKCBiNoc4V57eANBQvSpr
 
 -- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
@@ -307,35 +307,35 @@ COPY public.users (id, name, password, profile_image_path, created_at, deleted_a
 -- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
+SELECT pg_catalog.setval('public.posts_id_seq', 931, true);
 
 
 --
 -- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.roles_id_seq', 1, false);
+SELECT pg_catalog.setval('public.roles_id_seq', 7, true);
 
 
 --
 -- Name: threads_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.threads_id_seq', 1, false);
+SELECT pg_catalog.setval('public.threads_id_seq', 251, true);
 
 
 --
 -- Name: topics_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.topics_id_seq', 1, false);
+SELECT pg_catalog.setval('public.topics_id_seq', 254, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_id_seq', 286, true);
 
 
 --
@@ -438,5 +438,5 @@ ALTER TABLE ONLY public.user_roles
 -- PostgreSQL database dump complete
 --
 
-\unrestrict qmWiaBNj10yi4ua3sMU5jr2am7kXZVdJXxQdgsBBN4FvGTyPqc3S8cCDnFpp65I
+\unrestrict q4WjDiEPmeJphisMq8ZNeTTvSXONgRlQbjEt4JNcloQKCBiNoc4V57eANBQvSpr
 

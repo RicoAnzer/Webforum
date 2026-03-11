@@ -23,7 +23,7 @@ public class ThreadController {
     }
 
     //Add a new Thread
-    @PostMapping(value = {"/{topicSlug}/{threadName}", "/add/{topicSlug}/"})
+    @PostMapping(value = {"/{topicSlug}/{threadName}", "/{topicSlug}/"})
     public ResponseEntity<?> addThread(@PathVariable String topicSlug, @PathVariable(required = false) String threadName) {
         //Validating input (threadName) => topicSlug is always existing, otherwise no Thread can be added
         if (threadName == null || threadName.trim().isEmpty()) {

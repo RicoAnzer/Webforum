@@ -90,7 +90,6 @@ public class UserService implements UserDetailsService {
             String encodedPassword = passwordEncoder().encode(password);
             // Format createdAt to "dd-MM-YYYY"
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
-            Long id = null;
             // Create User Object
             // => id is automatically created inside database, id can be null at this stage
             // => Empty roles List as placeholder -> shows all roles assigned to user for
@@ -100,7 +99,7 @@ public class UserService implements UserDetailsService {
             // account
             // => isBanned is false at default, doesn't need to be set here
             com.web.forum.Entity.User newUser = new com.web.forum.Entity.User(
-                    id,
+                    null,
                     username,
                     new ArrayList<>(),
                     "",

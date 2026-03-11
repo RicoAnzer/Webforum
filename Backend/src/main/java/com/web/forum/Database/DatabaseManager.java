@@ -61,7 +61,7 @@ public class DatabaseManager {
                     + "id SERIAL PRIMARY KEY,"
                     + "name VarChar(30), "
                     + "password Text, "
-                    + "profile_image_path VarChar(100), "
+                    + "profile_image_path Text, "
                     + "created_at timestamp, "
                     + "deleted_at timestamp, "
                     + "is_banned Boolean"

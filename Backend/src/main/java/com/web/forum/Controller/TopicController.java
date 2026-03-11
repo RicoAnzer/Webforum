@@ -23,7 +23,7 @@ public class TopicController {
     }
 
     //Add a new Topic
-    @PostMapping(value = {"/{name}", "/add/"})
+    @PostMapping(value = {"/{name}", "/"})
     public ResponseEntity<?> addTopic(@PathVariable(required = false) String name) {
         if (name == null || name.trim().isEmpty()){
             throw new ConflictError("Topic is empty");

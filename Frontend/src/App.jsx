@@ -19,6 +19,7 @@ import { Header } from './components/topicsList.jsx'
 import { ThreadList } from './pages/ThreadList.jsx';
 import { Thread } from './pages/Thread.jsx';
 import { threadLoader } from './components/threadLoaders.jsx'
+import { CancelButton } from './components/cancelButton.jsx';
 
 //Import CSS styles
 import './Styles/App.css'
@@ -71,7 +72,7 @@ function Main() {
       setErrorMessage("")
     }
     catch (error) {
-      switch (error?.response?.data) {
+      switch (error?.response?.data?.message) {
         case "Username is empty":
           setErrorMessage(<FormattedMessage id="error.formRegister.userEmpty" />)
           break;
@@ -109,7 +110,7 @@ function Main() {
       setErrorMessage("")
     }
     catch (error) {
-      switch (error.response?.data) {
+      switch (error.response?.data?.message) {
         case "User not found":
           setErrorMessage(<FormattedMessage id="error.formLogin.userNotFound" />)
           break;
@@ -140,7 +141,7 @@ function Main() {
       setAddTopicInput("")
     }
     catch (error) {
-      switch (error.response?.data) {
+      switch (error.response?.data?.message) {
         case "Topic is empty":
           setErrorMessage(<FormattedMessage id="error.addTopic.empty" />)
           break;
@@ -168,7 +169,10 @@ function Main() {
               <PasswordInput />
               <ConfirmPasswordInput />
               <ErrorDisplay />
-              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+              <div className='button-holder'>
+                <CancelButton setVisible={setSignUpVisible}></CancelButton>
+                 <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+              </div>
             </form>
 
             <div className="hint">
@@ -185,7 +189,10 @@ function Main() {
               <NameInput />
               <PasswordInput />
               <ErrorDisplay />
-              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+              <div className='button-holder'>
+                <CancelButton setVisible={setLoginVisible}></CancelButton>
+                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+              </div>
             </form>
 
             <div className="hint">
@@ -201,7 +208,10 @@ function Main() {
             <form className="register-form" onSubmit={addTopic}>
               <AddTopicInput />
               <ErrorDisplay />
-              <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
+              <div className='button-holder'>
+                <CancelButton setVisible={setAddTopicVisible}></CancelButton>
+                <button type="submit" className="submit-btn"><FormattedMessage id="forum.form.addTopic" /></button>
+              </div>
             </form>
           </div>
         }

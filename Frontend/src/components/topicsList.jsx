@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { useTopics } from '../global-variables/Topics';
 import { useUser } from '../global-variables/SignedInUser.jsx'
 import { useAddTopicVisible, useLoginVisible, useSignUpVisible } from "../global-variables/PopupData";
+import { useError } from '../global-variables/ErrorMessage.jsx'
 
 import '../Styles/TopicsHeader.css';
 
@@ -16,6 +17,7 @@ const header = {
 //Use react-router-dom Link to dynamically create pages
 const DisplayTopics = ({ topicsList }) => {
     const { setAddTopicVisible } = useAddTopicVisible()
+    const { setErrorMessage } = useError();
     return <div className="topics-list">
         {topicsList?.length > 0 ? (
             <>
@@ -28,7 +30,8 @@ const DisplayTopics = ({ topicsList }) => {
                 ))}
             </>
         ) : null}
-        <div className='topics-container add-topic' onClick={() => setAddTopicVisible(prev => !prev)}>
+        {/**Display addTopic container, reset ErrorMessage if window is closed*/}
+        <div className='topics-container add-topic' onClick={() => {setAddTopicVisible(prev => !prev), setErrorMessage("")}}>
             <p><FormattedMessage id="forum.form.addTopic" /></p>
         </div>
     </div>
@@ -39,6 +42,7 @@ export const Header = () => {
     const { user, setUser } = useUser()
     const { setSignUpVisible } = useSignUpVisible()
     const { setLoginVisible } = useLoginVisible()
+    const { setErrorMessage } = useError()
 
     async function logout() {
         try {
@@ -88,17 +92,17 @@ export const Header = () => {
         <header>
             <DisplayTopics topicsList={topics}></DisplayTopics>
             <div className='button-container'>
-                {/**Display if logged in*/}
+                {/**Display if logged in, reset ErrorMessage if window is closed*/}
                 {user != null &&
                     <div className='profile'>
                         <button type="button" onClick={logout} className="submit-btn"><FormattedMessage id="forum.form.logout" /></button>
                     </div>}
 
-                {/**Display if logged out*/}
+                {/**Display if logged out, reset ErrorMessage if window is closed*/}
                 {user == null &&
                     <div className='button-holder'>
-                        <button type="button" onClick={() => setLoginVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
-                        <button type="button" onClick={() => setSignUpVisible(prev => !prev)} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
+                        <button type="button" onClick={() => {setLoginVisible(prev => !prev), setErrorMessage("")}} className="submit-btn"><FormattedMessage id="forum.form.login" /></button>
+                        <button type="button" onClick={() => {setSignUpVisible(prev => !prev), setErrorMessage("")}} className="submit-btn"><FormattedMessage id="forum.form.register" /></button>
                     </div>
                 }
             </div>

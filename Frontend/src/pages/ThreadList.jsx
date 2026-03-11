@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Link, useLoaderData, useParams, useRevalidator } from 'react-router-dom';
+import { Link, useLoaderData, useRevalidator } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useError, DisplayErrorMessage } from '../global-variables/ErrorMessage.jsx';
 import { useAddThreadInput, useAddThreadVisible } from '../global-variables/PopupData.jsx';
@@ -24,6 +24,7 @@ function ErrorDisplay() {
 //Use react-router-dom Link to dynamically create pages for each Thread
 const DisplayThreads = ({ threadList }) => {
     const { setAddThreadVisible } = useAddThreadVisible()
+    const { setErrorMessage } = useError()
     return <>
         {threadList?.length > 0 ? (
             threadList.map((thread) => (
@@ -34,7 +35,8 @@ const DisplayThreads = ({ threadList }) => {
                 </Link>
             ))
         ) : null}
-        <div className='thread-container add-thread' onClick={() => setAddThreadVisible(prev => !prev)}>
+        {/**Display addThread container, reset ErrorMessage if window is closed*/}
+        <div className='thread-container add-thread' onClick={() =>{ setAddThreadVisible(prev => !prev), setErrorMessage("")}}>
             <p><FormattedMessage id="forum.form.addThread" /></p>
         </div>
     </>
@@ -70,7 +72,7 @@ export const ThreadList = () => {
             revalidator.revalidate();
         }
         catch (error) {
-            switch (error.response?.data) {
+            switch (error.response?.data?.message) {
                 case "Thread name is empty":
                     setErrorMessage(<FormattedMessage id="error.addThread.empty" />)
                     break;

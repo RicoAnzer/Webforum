@@ -37,7 +37,7 @@ public class UserDAO implements IUserDAO {
     public LoginCredentials create(User user, String password) {
         // SQL Statement to add new users to database
         String createSQL = "INSERT INTO users (name, password, profile_image_path, created_at, deleted_at, is_banned)"
-                + "VALUES (?, ?, ?, ?, ?, ?)"
+                + "VALUES (?, ?, ?, ?, ?, ?) "
                 + "RETURNING id, name;";
         LoginCredentials credentials = null;
         // Execute statement
